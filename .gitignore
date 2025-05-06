@@ -1,33 +1,44 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Java
+*.class
 
-### STS ###
+# Maven
+target/
+log/
+
+# Gradle (예외로 혹시 모를 포함)
+build/
+
+# Spring Tool Suite
 .apt_generated
-.classpath
 .factorypath
-.project
-.settings
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# VS Code
 .vscode/
+
+# macOS
+.DS_Store
+
+# 기타
+HELP.md
+
+# 그래프 캐시.geojson 파일
+graph-cache/
+
+# 그래프호퍼 클론 받은 것
+graphhopper/
+
+# geojson 파일 전체 업로드 x
+*.geojson
