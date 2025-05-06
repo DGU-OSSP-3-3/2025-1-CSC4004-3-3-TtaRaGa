@@ -9,4 +9,5 @@ public class TtaragaApplication {
         SpringApplication.run(TtaragaApplication.class, args);
     }
 
+
 }
