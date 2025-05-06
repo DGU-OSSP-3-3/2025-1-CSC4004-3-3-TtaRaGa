@@ -5,7 +5,7 @@
 target/
 log/
 
-# Gradle (예외로 혹시 모를 포함)
+# Gradle
 build/
 
 # Spring Tool Suite
