@@ -1,4 +1,4 @@
-package com.example.ttaraga.ttaraga.Service;
+package com.example.ttaraga.ttaraga.service;
 
 /*기능
 주어진 시간 내에 갈 수 있는 포인터를 필터링

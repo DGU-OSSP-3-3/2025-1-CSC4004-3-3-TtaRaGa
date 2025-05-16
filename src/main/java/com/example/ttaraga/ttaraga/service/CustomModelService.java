@@ -1,4 +1,4 @@
-package com.example.ttaraga.ttaraga.Service;
+package com.example.ttaraga.ttaraga.service;
 
 import org.springframework.stereotype.Service;
 
