@@ -2,15 +2,7 @@ package com.example.ttaraga.ttaraga.dto;
 
 import com.example.ttaraga.ttaraga.entity.Density;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Densitydto {
     private long id;
 
@@ -23,6 +15,46 @@ public class Densitydto {
     @JsonProperty("density")
     private double densityLevel;
 
+    public Densitydto() {}
+
+    public Densitydto(long id, double latitude, double longitude, double densityLevel) {
+        this.id = id;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.densityLevel = densityLevel;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getDensityLevel() {
+        return densityLevel;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setDensityLevel(double densityLevel) {
+        this.densityLevel = densityLevel;
+    }
 
     // Entity → DTO
     public static Densitydto fromEntity(Density density) {
