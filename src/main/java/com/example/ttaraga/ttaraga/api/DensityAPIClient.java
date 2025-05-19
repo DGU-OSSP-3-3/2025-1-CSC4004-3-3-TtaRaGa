@@ -1,7 +1,7 @@
 package com.example.ttaraga.ttaraga.api;
 
 import com.example.ttaraga.ttaraga.dto.CityDataResponse;
-import com.example.ttaraga.ttaraga.dto.Densitydto;
+import com.example.ttaraga.ttaraga.dto.DensityDto;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,7 +17,7 @@ public class DensityAPIClient {
         this.restTemplate = new RestTemplate();
     }
 
-    public List<Densitydto> fetchData() {
+    public List<DensityDto> fetchData() {
         String baseUrl = "http://openapi.seoul.go.kr:8088";
         String serviceKey = "7747754d61736d303935746e444267"; // 실제 키
         String format = "json";
