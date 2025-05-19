@@ -31,6 +31,7 @@ public class BikeAPIClient {
         );
 
         CityDataResponse response = restTemplate.getForObject(url, CityDataResponse.class);
-        return response != null ? response.getCityData().getRow() : List.of();
+        //return response != null ? response.getCityData().getRow() : List.of();
+        return null;
     }
 }

@@ -10,7 +10,7 @@ import lombok.Setter;
 public class AttractingPlace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long midpointId;
+    private long j;
 
     @Column(nullable = false)
     private double pointLatitude;
