@@ -1,23 +1,25 @@
 package com.example.ttaraga.ttaraga.service;
 
+import com.example.ttaraga.ttaraga.api.APIClient; // 패키지 수정
 import com.example.ttaraga.ttaraga.mapper.DtoMapper;
 import com.example.ttaraga.ttaraga.dto.DensityDto;
 import com.example.ttaraga.ttaraga.entity.Density;
 import com.example.ttaraga.ttaraga.repository.DensityRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode; // JsonNode 임포트 추가
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import java.util.List;
 
 @Service
 public class DensityService {
-    private final ApiClient apiClient;
+    private final APIClient apiClient;
     private final DensityRepository densityRepository;
     private final DtoMapper dtoMapper;
     private final ObjectMapper objectMapper;
 
-    public DensityService(ApiClient apiClient, DensityRepository densityRepository, DtoMapper dtoMapper, ObjectMapper objectMapper) {
+    public DensityService(APIClient apiClient, DensityRepository densityRepository, DtoMapper dtoMapper, ObjectMapper objectMapper) {
         this.apiClient = apiClient;
         this.densityRepository = densityRepository;
         this.dtoMapper = dtoMapper;
@@ -25,10 +27,12 @@ public class DensityService {
     }
 
     public Flux<DensityDto> fetchAndSaveDensities() {
-        return apiClient.fetchDensityJson()
+        return apiClient.fetchCityDataJson("광화문·덕수궁", 1, 5)
                 .flatMapMany(json -> {
                     try {
-                        List<DensityDto> densityDTOs = objectMapper.readValue(json, new TypeReference<List<DensityDto>>(){});
+                        JsonNode root = objectMapper.readTree(json);
+                        JsonNode densityData = root.path("CITYDATA").path("DENSITY");
+                        List<DensityDto> densityDTOs = objectMapper.convertValue(densityData, new TypeReference<List<DensityDto>>() {});
                         List<Density> entities = densityDTOs.stream()
                                 .map(dtoMapper::toDensityEntity)
                                 .toList();
