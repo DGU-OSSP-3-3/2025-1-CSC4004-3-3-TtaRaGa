@@ -10,7 +10,7 @@ import lombok.Setter;
 public class Bike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long stationId;
+    private String stationId;
 
     @Column(nullable = false)
     private long parkingBikeTotCnt;
@@ -24,4 +24,3 @@ public class Bike {
     @Column(name = "stationName", nullable = false)
     private String stationName;
 }
-

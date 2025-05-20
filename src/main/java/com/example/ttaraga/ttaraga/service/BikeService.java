@@ -27,19 +27,32 @@ public class BikeService {
     }
 
     public Flux<BikeDto> fetchAndSaveBikes() {
-        return apiClient.fetchCityDataJson("광화문·덕수궁", 1, 5)
+        return apiClient.fetchBikeDataJson(1, 5)
                 .flatMapMany(json -> {
                     try {
                         JsonNode root = objectMapper.readTree(json);
-                        JsonNode bikeStations = root.path("CITYDATA").path("BIKE_STATIONS");
-                        List<BikeDto> bikeDTOs = objectMapper.convertValue(bikeStations, new TypeReference<List<BikeDto>>() {});
-                        List<Bike> entities = bikeDTOs.stream()
-                                .map(dtoMapper::toBikeEntity)
-                                .toList();
-                        bikeRepository.saveAll(entities);
-                        return Flux.fromIterable(bikeDTOs);
+                        int totalCount = root.path("rentBikeStatus").path("list_total_count").asInt(1471);
+                        return Flux.just(
+                                        new int[]{1, Math.min(1000, totalCount)},
+                                        new int[]{1001, Math.min(1471, totalCount)}
+                                )
+                                .flatMap(range -> apiClient.fetchBikeDataJson(range[0], range[1]))
+                                .flatMap(batchJson -> {
+                                    try {
+                                        JsonNode batchRoot = objectMapper.readTree(batchJson);
+                                        JsonNode bikeStations = batchRoot.path("rentBikeStatus").path("row");
+                                        List<BikeDto> bikeDTOs = objectMapper.convertValue(bikeStations, new TypeReference<List<BikeDto>>() {});
+                                        List<Bike> entities = bikeDTOs.stream()
+                                                .map(dtoMapper::toBikeEntity)
+                                                .toList();
+                                        bikeRepository.saveAll(entities);
+                                        return Flux.fromIterable(bikeDTOs);
+                                    } catch (Exception e) {
+                                        return Flux.error(new RuntimeException("Batch JSON 파싱 실패: " + e.getMessage()));
+                                    }
+                                });
                     } catch (Exception e) {
-                        return Flux.error(new RuntimeException("Bike JSON 파싱 실패: " + e.getMessage()));
+                        return Flux.error(new RuntimeException("초기 JSON 파싱 실패: " + e.getMessage()));
                     }
                 });
     }
