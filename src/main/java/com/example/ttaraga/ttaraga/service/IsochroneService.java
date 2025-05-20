@@ -7,8 +7,10 @@ package com.example.ttaraga.ttaraga.service;
 초안을 작성하고 나중에 더 업글하는식으로 진행할 필요있음 ->지금 진행 너무 느림
  */
 
+import com.graphhopper.GraphHopper;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.util.GeometricShapeFactory;
 import org.springframework.stereotype.Service;
@@ -16,29 +18,41 @@ import com.graphhopper.isochrone.algorithm.*;
 
 @Service
 public class IsochroneService {
-    //private final GraphHopper hopper;
-
+    private final GraphHopper hopper;
     private static final GeometryFactory geometryFactory = new GeometryFactory();
 
-
-    public Polygon createCircularRange(double Lat, double Lon, double minutes) {
-
-        // 자전거 평균 속도 15km/h → 0.25km/min
-        double radiusKm = minutes * 0.25;
-
-        // 위도/경도 기준으로 환산 (1도 ≈ 111km)
-        double radiusDeg = radiusKm / 111.0;
-
-        GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
-
-        shapeFactory.setNumPoints(50); //원을 구성할 점 개수
-        shapeFactory.setCentre(new Coordinate(Lon,Lat));
-        shapeFactory.setSize(radiusDeg*2); //지름 기준
-
-        return shapeFactory.createCircle(); //Polygon 객체로 리턴
+    public IsochroneService(GraphHopper hopper) {
+        this.hopper = hopper;
     }
 
+    public Polygon createCircularRange(double lat, double lon, double minutes) {
 
+        double speedKmh = 15.0; // 평균 자전거 속도 (km/h)
+        double distanceKm = (speedKmh * minutes) / 60.0;
 
+        int numPoints = 36; // 원형을 구성할 점 수 (10도)
+        Coordinate[] coords = new Coordinate[numPoints+1];
+
+        for(int i=0; i<numPoints; i++) {
+            double angle = 2*Math.PI * i / numPoints;
+            double dx = distanceKm * Math.cos(angle);
+            double dy = distanceKm * Math.sin(angle);
+
+            //위도 경도 계산
+            double deltaLat = dy / 111.32;
+            double deltaLon = dx / (111.32 * Math.cos(Math.toRadians(lat)));
+            double pointLat = lat + deltaLat;
+            double pointLon = lon + deltaLon;
+
+            coords[i] = new Coordinate(pointLat, pointLon);
+        }
+
+        coords[numPoints] = coords[0]; //다각형 닫기
+
+        LinearRing ring = geometryFactory.createLinearRing(coords);
+        return geometryFactory.createPolygon(ring);
+        //원형에 가까운 다각형 (36개의 꼭지점)
+        //리턴값 GeoJson화 시키면 지도에 시각화 가능 -> jts2geojson라이브러리 이용
+    }
 
 }
