@@ -10,15 +10,18 @@ import lombok.Setter;
 public class Density {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long AREA_CD;
 
     @Column(nullable = false)
+    private String AREA_NM;
+
+    @Column
     private double latitude;
 
-    @Column(nullable = false)
+    @Column
     private double longitude;
 
-    @Column(name = "density_level", nullable = false)
-    private double densityLevel;
+    @Column(name = "AREA_CONGEST_LVL", nullable = false)
+    private String AREA_CONGEST_LVL;
 }
 

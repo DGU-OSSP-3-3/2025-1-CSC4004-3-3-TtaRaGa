@@ -27,11 +27,11 @@ public class DensityService {
     }
 
     public Flux<DensityDto> fetchAndSaveDensities() {
-        return apiClient.fetchCityDataJson("광화문·덕수궁", 1, 5)
+        return apiClient.fetchDensityDataJson("광화문·덕수궁", 1, 120)
                 .flatMapMany(json -> {
                     try {
                         JsonNode root = objectMapper.readTree(json);
-                        JsonNode densityData = root.path("CITYDATA").path("DENSITY");
+                        JsonNode densityData = root.path("SeoulRtd.citydata_ppltn").path("DENSITY");
                         List<DensityDto> densityDTOs = objectMapper.convertValue(densityData, new TypeReference<List<DensityDto>>() {});
                         List<Density> entities = densityDTOs.stream()
                                 .map(dtoMapper::toDensityEntity)
