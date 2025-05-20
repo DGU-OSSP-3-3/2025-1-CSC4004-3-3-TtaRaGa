@@ -4,7 +4,7 @@
 # Maven
 target/
 log/
-
+*.properties
 # Gradle (혹시나 해서)
 build/
 
