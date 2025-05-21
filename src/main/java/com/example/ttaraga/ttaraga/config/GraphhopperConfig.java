@@ -24,9 +24,9 @@ public class GraphhopperConfig {
     @Bean
     public GraphHopper graphHopper(){
         GraphHopper hopper = new GraphHopper();
-        hopper.setOSMFile("graphhopper.osm"); // osm 파일경로 나중에 수정 ㄱㄱ
+        hopper.setOSMFile("src/main/resources/seoul-non-military.osm.pbf"); // osm 파일경로 나중에 수정 ㄱㄱ
         hopper.setGraphHopperLocation("graph-cache"); // 캐시 저장 위치
-        hopper.setProfiles(List.of(new Profile("bike").setVehicle("bike").setWeighting("fastest")));
+        hopper.setProfiles(List.of(new Profile("bike").setVehicle("bike").setWeighting("custom")));
         hopper.getCHPreparationHandler().setCHProfiles(List.of(new CHProfile("bike")));
         hopper.importOrLoad(); // osm 데이터를 로딩 또는 캐시 사용
 
