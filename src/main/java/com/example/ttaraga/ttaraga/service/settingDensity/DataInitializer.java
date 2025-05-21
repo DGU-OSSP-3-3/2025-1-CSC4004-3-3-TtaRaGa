@@ -15,6 +15,7 @@ import java.util.List;
 public class DataInitializer implements ApplicationRunner {
     private final ExcelReaderService excelReaderService;
     private final DensityAreaInfoService areaInfoService;
+    private final DensityService densityService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -37,6 +38,24 @@ public class DataInitializer implements ApplicationRunner {
             System.err.println("엑셀 파일 로딩 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
         }
+
+        // 2. 엑셀 데이터 로드 완료 후, API를 통해 인구 밀집도 레벨 업데이트 (애플리케이션 시작 시 한 번)
+        //    areaInfoService.count() > 0 이라는 것은 엑셀 데이터가 DB에 있음을 의미합니다.
+        if (areaInfoService.count() > 0) {
+            try {
+                System.out.println("--- 애플리케이션 시작 시 인구 밀집도 레벨 API 호출 및 DB 업데이트 시작 ---");
+                // 스케줄링된 메서드를 직접 호출하여 즉시 첫 업데이트를 수행합니다.
+                densityService.updatePopulationDensityLevelsFromApi();
+                System.out.println("--- 애플리케이션 시작 시 인구 밀집도 레벨 API 호출 및 DB 업데이트 완료 ---");
+            } catch (Exception e) {
+                System.err.println("애플리케이션 시작 시 인구 밀집도 레벨 업데이트 중 오류 발생: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("엑셀 데이터 로드 실패 또는 데이터 없음. API 업데이트를 건너뜁니다.");
+        }
+
+        System.out.println("--- 애플리케이션 초기화 완료 ---");
     }
 }
 //@Component
