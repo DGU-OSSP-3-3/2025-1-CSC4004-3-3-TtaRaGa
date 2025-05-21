@@ -12,21 +12,15 @@ GraphHopper Core API 호출 처리
 GraphHoopper 응답을 GeoJson으로 변환하자.
  */
 
-import com.example.ttaraga.ttaraga.GeoJsonExporter;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.ResponsePath;
-import com.graphhopper.util.Instruction;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
-import org.hibernate.query.sqm.tree.domain.SqmPathWrapper;
-import org.mariadb.jdbc.type.LineString;
 import org.springframework.stereotype.Service;
 import com.graphhopper.GraphHopper;
 
-import java.awt.*;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class GraphhopperService {
@@ -38,10 +32,10 @@ public class GraphhopperService {
     }
 
     //여러 포인트를 경유하는 경로를 GeoJson으로 변환하기
-    public GeoJsonExporter buildRouteGeoJson(GHPoint start, List<GHPoint> waypoints){
+    public String buildRouteGeoJson(GHPoint start, List<GHPoint> waypoints){
         GHRequest request = new GHRequest();
         request.setProfile("bike"); //자전거 프로필
-        request.setLocale("ko");
+        //request.setLocale("ko");
 
         //출발지 + 경유지 추가
         request.addPoint(start);
@@ -77,7 +71,7 @@ public class GraphhopperService {
         String geoJsonString = geoJson.toString(); //완성된 GEOJSON문자열
 
         //뭘 리턴할지는 나중에 생각하자. 오늘은 틀만 작성하자.
-        return null;
+        return geoJsonString;
     }
 
 

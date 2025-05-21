@@ -99,6 +99,12 @@
             <version>2.18.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.3</version> <!-- 최신 버전 확인 -->
+        </dependency>
+
 
 
 
