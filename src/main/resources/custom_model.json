@@ -1,0 +1,9 @@
+{
+  "priority": [
+    {
+      "if": "road_access != DESTINATION",
+      "multiply_by": 1.0
+    }
+  ],
+  "speed": []
+}

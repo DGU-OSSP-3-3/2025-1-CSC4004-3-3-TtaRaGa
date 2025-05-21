@@ -1,15 +1,16 @@
 package com.example.ttaraga.ttaraga.config;
 
 import com.graphhopper.GraphHopper;
+import com.graphhopper.isochrone.algorithm.*;
 import com.graphhopper.config.CHProfile;
 import com.graphhopper.config.Profile;
-import com.graphhopper.util.CustomModel;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
 import java.util.List;
 
 /*
@@ -21,12 +22,11 @@ import java.util.List;
 public class GraphhopperConfig {
 
     @Bean
-    public GraphHopper graphHopper() {
+    public GraphHopper graphHopper(){
         GraphHopper hopper = new GraphHopper();
-        hopper.setOSMFile("seoul-non-military.osm.pbf"); // osm 파일경로 나중에 수정 ㄱㄱ
+        hopper.setOSMFile("graphhopper.osm"); // osm 파일경로 나중에 수정 ㄱㄱ
         hopper.setGraphHopperLocation("graph-cache"); // 캐시 저장 위치
-        hopper.setProfiles(List.of(new Profile("bike").setVehicle("bike").setWeighting("custom").setCustomModel(new CustomModel())
-        ));
+        hopper.setProfiles(List.of(new Profile("bike").setVehicle("bike").setWeighting("fastest")));
         hopper.getCHPreparationHandler().setCHProfiles(List.of(new CHProfile("bike")));
         hopper.importOrLoad(); // osm 데이터를 로딩 또는 캐시 사용
 
@@ -34,9 +34,10 @@ public class GraphhopperConfig {
     }
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    public RestTemplate restTemplate(RestTemplateBuilder builder){
         return builder.build();
     }
+
 
 
 }
