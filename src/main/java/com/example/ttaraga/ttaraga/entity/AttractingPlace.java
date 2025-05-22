@@ -13,15 +13,17 @@ import lombok.Setter;
 @Setter
 public class AttractingPlace {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long j;
+    private String placeId;
+
+    @Column(name = "placeName", nullable = false)
+    private String placeName;
 
     @Column(nullable = false)
-    private double pointLatitude;
+    private double placeLatitude;
 
     @Column(nullable = false)
-    private double pointLongitude;
+    private double placeLongitude;
 
-    @Column(name = "pointName", nullable = false)
-    private String pointName;
+    @Column(name = "detail", nullable = false)
+    private String detail;
 }
