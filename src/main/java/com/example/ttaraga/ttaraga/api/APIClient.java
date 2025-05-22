@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class APIClient {
     private final WebClient webClient;
-    private final String apiKey = "example";
+    private final String apiKey = "4e704f70546a696838314b526e4e6a";
     private final String baseUrl = "http://openapi.seoul.go.kr:8088";
 
     public APIClient(WebClient.Builder webClientBuilder) {
