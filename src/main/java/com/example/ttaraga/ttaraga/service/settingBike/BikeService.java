@@ -1,5 +1,6 @@
-package com.example.ttaraga.ttaraga.service;
+package com.example.ttaraga.ttaraga.service.settingBike;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import reactor.core.publisher.Flux;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +29,7 @@ public class BikeService {
     private BikeRepository bikeRepository;
 
     @Transactional
+    @Scheduled(fixedRateString = "${app.api.update-interval-ms:600000}") // ⚡️ 10분마다 실행되도록 설정
     public Flux<BikeDto> fetchAndSaveBikes() {
         int totalCount = 1471; // totalCount 고정
         return Flux.just(

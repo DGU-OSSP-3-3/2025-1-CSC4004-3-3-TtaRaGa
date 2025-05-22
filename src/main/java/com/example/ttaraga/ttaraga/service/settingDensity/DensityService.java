@@ -2,7 +2,7 @@ package com.example.ttaraga.ttaraga.service.settingDensity;
 
 
 import com.example.ttaraga.ttaraga.api.DensityNewAPIClient;
-import com.example.ttaraga.ttaraga.dto.CityDataResponse;
+import com.example.ttaraga.ttaraga.dto.CityDataResponse_NEW;
 import com.example.ttaraga.ttaraga.entity.DensityAreaInfo;
 import com.example.ttaraga.ttaraga.repository.DensityAreaInfoRepository;
 import jakarta.transaction.Transactional;

@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+/*
+서울 따릉이 엔티티
+ */
+
 @Entity
 @Getter
 @Setter
