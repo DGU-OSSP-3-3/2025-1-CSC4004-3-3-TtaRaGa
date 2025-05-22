@@ -1,4 +1,4 @@
-package com.example.ttaraga.ttaraga.service;
+package com.example.ttaraga.ttaraga.service.Routing;
 /*
 여기서 도로 가중치에 대해 설정을 해주자.
  */

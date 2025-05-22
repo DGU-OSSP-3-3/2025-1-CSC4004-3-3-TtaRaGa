@@ -15,6 +15,16 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+/*
+API 코드 호출하는거 새로 작성했습니다.
+
+호출하는거 시간 재봤는데 120개 정도 데이터의 api불러오는데 대략 2분 20초 걸림
+
+api키값은 application.properties에 몰아놨습니다. for 보안 유지
+
+서울 밀집도 api 내용 불러오는 코드임 -> 서비스 코드에서 사용
+ */
+
 @Component
 public class DensityNewAPIClient {
 

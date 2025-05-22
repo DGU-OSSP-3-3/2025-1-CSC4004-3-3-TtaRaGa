@@ -1,4 +1,4 @@
-package com.example.ttaraga.ttaraga.service;
+package com.example.ttaraga.ttaraga.service.getPoint;
 /*
 사용자가 시작점(위도,경도) 와 시간을 주면
 해당 코드에서 해당 시간 내에 갈 수 있는 범위 폴리곤으로 줌
@@ -12,9 +12,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.util.GeometricShapeFactory;
 import org.springframework.stereotype.Service;
-import com.graphhopper.isochrone.algorithm.*;
 
 @Service
 public class IsochroneService {

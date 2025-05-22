@@ -2,7 +2,7 @@ package com.example.ttaraga.ttaraga.service.settingDensity;
 
 
 import com.example.ttaraga.ttaraga.api.DensityNewAPIClient;
-import com.example.ttaraga.ttaraga.dto.CityDataResponse;
+import com.example.ttaraga.ttaraga.dto.CityDataResponse_NEW;
 import com.example.ttaraga.ttaraga.entity.DensityAreaInfo;
 import com.example.ttaraga.ttaraga.repository.DensityAreaInfoRepository;
 import jakarta.transaction.Transactional;
@@ -11,6 +11,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+/*
+1. 인구 밀집도 엑셀 데이터를 db에 로드하고 (코드 실행 시 맨 처음 1회만 실행)
+2. 인구 밀집도 api를 가져와서 맨 처음 시작 실행 + 10분 단위로 반복 실행 1
+
+api를 불러오는데 걸리는 시간이 대략 2~3분 걸림
+다 불러오고 내용을 리스트에 담은 다음에 한번에 db에 넣어줌 (이건 1초도 안걸림)
+
+학교 와파 왜이래
+ */
 
 @Service
 @RequiredArgsConstructor

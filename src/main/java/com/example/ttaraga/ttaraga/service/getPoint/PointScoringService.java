@@ -1,4 +1,4 @@
-package com.example.ttaraga.ttaraga.service;
+package com.example.ttaraga.ttaraga.service.getPoint;
 /*
 관광지 가치 평가 로직 담당
 입력: Point + 현재 위치

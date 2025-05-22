@@ -1,4 +1,4 @@
-package com.example.ttaraga.ttaraga.service;
+package com.example.ttaraga.ttaraga.service.Routing;
 /*
 핵심 총괄 서비스
 사용자 요청을 처리하는 "최상위 조립" 서비스
