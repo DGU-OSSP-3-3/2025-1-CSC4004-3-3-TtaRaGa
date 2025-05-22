@@ -136,7 +136,7 @@ public class CityDataResponse_NEW {
         @JsonProperty("PPLTN_RATE_40") private String ppltnRate40;
         @JsonProperty("PPLTN_RATE_50") private String ppltnRate50;
         @JsonProperty("PPLTN_RATE_60") private String ppltnRate60;
-        @JsonProperty("PPLTN_RATE_70") private String ppltnRate70;
+//        @JsonProperty("PPLTN_RATE_70") private String ppltnRate70;
 
         @JsonProperty("RESNT_PPLTN_RATE")
         private String resntPpltnRate; // 상주 인구 비율
