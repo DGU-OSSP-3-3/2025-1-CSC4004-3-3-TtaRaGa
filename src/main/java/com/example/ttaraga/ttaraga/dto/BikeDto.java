@@ -13,7 +13,7 @@ public class BikeDto {
 
     @JsonProperty("parkingBikeTotCnt")
     @JsonDeserialize(using = StringToLongDeserializer.class) // 여기에 커스텀 Deserializer 적용
-    private long parkingBikeTotCnt; // 타입은 그대로 long 유지
+    private long parkingBikeTotCnt;
 
     @JsonProperty("stationLatitude")
     private double stationLatitude;

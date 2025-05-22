@@ -16,6 +16,7 @@ public class DtoMapper {
         bike.setStationName(bikedto.getStationName());
         bike.setStationLatitude(bikedto.getStationLatitude());
         bike.setStationLongitude(bikedto.getStationLongitude());
+        bike.setParkingBikeTotCnt(bikedto.getParkingBikeTotCnt());
         return bike;
     }
 
