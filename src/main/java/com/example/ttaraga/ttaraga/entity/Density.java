@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class Density {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long AREA_CD;
 
     @Column(nullable = false)
