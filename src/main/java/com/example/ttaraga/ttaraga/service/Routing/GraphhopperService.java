@@ -1,4 +1,4 @@
-package com.example.ttaraga.ttaraga.service;
+package com.example.ttaraga.ttaraga.service.Routing;
 
 /*
 GraphHopper Core API 호출 처리

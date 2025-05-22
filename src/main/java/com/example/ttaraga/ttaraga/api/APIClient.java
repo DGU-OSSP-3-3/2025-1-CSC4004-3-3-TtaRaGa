@@ -1,5 +1,6 @@
 package com.example.ttaraga.ttaraga.api;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -7,7 +8,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class APIClient {
     private final WebClient webClient;
-    private final String apiKey = "4e704f70546a696838314b526e4e6a";
+
+    @Value("${seoul.api.bike}")
+    private String apiKey;
+            ;
     private final String baseUrl = "http://openapi.seoul.go.kr:8088";
 
     public APIClient(WebClient.Builder webClientBuilder) {

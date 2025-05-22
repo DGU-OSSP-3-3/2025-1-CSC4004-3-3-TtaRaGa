@@ -91,8 +91,8 @@ public class CityDataResponse_NEW {
 
         // "ROAD_TRAFFIC_STTS"도 별도의 DTO로 매핑할 수 있지만, 여기서는 간략하게 생략합니다.
         // 만약 도로 교통 정보도 필요하다면 아래와 같이 추가 DTO를 정의해야 합니다.
-        @JsonProperty("ROAD_TRAFFIC_STTS")
-        private RoadTrafficStatus roadTrafficStatus;
+//        @JsonProperty("ROAD_TRAFFIC_STTS")
+//        private RoadTrafficStatus roadTrafficStatus;
     }
 
     /**
@@ -116,127 +116,127 @@ public class CityDataResponse_NEW {
         @JsonProperty("AREA_CONGEST_MSG")
         private String areaCongestMsg; // 인구 밀집도 메시지
 
-        @JsonProperty("AREA_PPLTN_MIN")
-        private String areaPpltnMin; // 최소 인구 (String으로 오는 경우)
-
-        @JsonProperty("AREA_PPLTN_MAX")
-        private String areaPpltnMax; // 최대 인구 (String으로 오는 경우)
-
-        @JsonProperty("MALE_PPLTN_RATE")
-        private String malePpltnRate; // 남성 인구 비율
-
-        @JsonProperty("FEMALE_PPLTN_RATE")
-        private String femalePpltnRate; // 여성 인구 비율
+//        @JsonProperty("AREA_PPLTN_MIN")
+//        private String areaPpltnMin; // 최소 인구 (String으로 오는 경우)
+//
+//        @JsonProperty("AREA_PPLTN_MAX")
+//        private String areaPpltnMax; // 최대 인구 (String으로 오는 경우)
+////
+//        @JsonProperty("MALE_PPLTN_RATE")
+//        private String malePpltnRate; // 남성 인구 비율
+//
+//        @JsonProperty("FEMALE_PPLTN_RATE")
+//        private String femalePpltnRate; // 여성 인구 비율
 
         // 연령대별 인구 비율도 필요하면 추가합니다.
-        @JsonProperty("PPLTN_RATE_0") private String ppltnRate0;
-        @JsonProperty("PPLTN_RATE_10") private String ppltnRate10;
-        @JsonProperty("PPLTN_RATE_20") private String ppltnRate20;
-        @JsonProperty("PPLTN_RATE_30") private String ppltnRate30;
-        @JsonProperty("PPLTN_RATE_40") private String ppltnRate40;
-        @JsonProperty("PPLTN_RATE_50") private String ppltnRate50;
-        @JsonProperty("PPLTN_RATE_60") private String ppltnRate60;
+//        @JsonProperty("PPLTN_RATE_0") private String ppltnRate0;
+//        @JsonProperty("PPLTN_RATE_10") private String ppltnRate10;
+//        @JsonProperty("PPLTN_RATE_20") private String ppltnRate20;
+//        @JsonProperty("PPLTN_RATE_30") private String ppltnRate30;
+//        @JsonProperty("PPLTN_RATE_40") private String ppltnRate40;
+//        @JsonProperty("PPLTN_RATE_50") private String ppltnRate50;
+//        @JsonProperty("PPLTN_RATE_60") private String ppltnRate60;
 //        @JsonProperty("PPLTN_RATE_70") private String ppltnRate70;
 
-        @JsonProperty("RESNT_PPLTN_RATE")
-        private String resntPpltnRate; // 상주 인구 비율
-
-        @JsonProperty("NON_RESNT_PPLTN_RATE")
-        private String nonResntPpltnRate; // 비상주 인구 비율
-
-        @JsonProperty("REPLACE_YN")
-        private String replaceYn; // 대체 여부
+//        @JsonProperty("RESNT_PPLTN_RATE")
+//        private String resntPpltnRate; // 상주 인구 비율
+//
+//        @JsonProperty("NON_RESNT_PPLTN_RATE")
+//        private String nonResntPpltnRate; // 비상주 인구 비율
+//
+//        @JsonProperty("REPLACE_YN")
+//        private String replaceYn; // 대체 여부
 
         @JsonProperty("PPLTN_TIME")
         private String ppltnTime; // 인구 데이터 기준 시간
 
-        @JsonProperty("FCST_YN")
-        private String fcstYn; // 예측 데이터 존재 여부
+//        @JsonProperty("FCST_YN")
+//        private String fcstYn; // 예측 데이터 존재 여부
 
-        // ✅ "FCST_PPLTN"은 시간별 예측 인구 데이터 배열입니다.
-        @JsonProperty("FCST_PPLTN")
-        private List<ForecastPopulation> fcstPopulation;
+//        // ✅ "FCST_PPLTN"은 시간별 예측 인구 데이터 배열입니다.
+//        @JsonProperty("FCST_PPLTN")
+//        private List<ForecastPopulation> fcstPopulation;
     }
 
     /**
      * "FCST_PPLTN" 배열 안에 있는 각 예측 인구 항목을 매핑하는 내부 클래스.
      */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ForecastPopulation {
-        @JsonProperty("FCST_TIME")
-        private String fcstTime;
-
-        @JsonProperty("FCST_CONGEST_LVL")
-        private String fcstCongestLvl;
-
-        @JsonProperty("FCST_PPLTN_MIN")
-        private String fcstPpltnMin;
-
-        @JsonProperty("FCST_PPLTN_MAX")
-        private String fcstPpltnMax;
-    }
+//    @Getter
+//    @Setter
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class ForecastPopulation {
+//        @JsonProperty("FCST_TIME")
+//        private String fcstTime;
+//
+//        @JsonProperty("FCST_CONGEST_LVL")
+//        private String fcstCongestLvl;
+//
+//        @JsonProperty("FCST_PPLTN_MIN")
+//        private String fcstPpltnMin;
+//
+//        @JsonProperty("FCST_PPLTN_MAX")
+//        private String fcstPpltnMax;
+//    }
 
     /**
      * "ROAD_TRAFFIC_STTS" 키에 해당하는 도로 교통 현황을 매핑하는 내부 클래스.
      * 여기에는 평균 도로 데이터와 각 도로 링크별 교통 현황이 있습니다.
      */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class RoadTrafficStatus {
-        @JsonProperty("AVG_ROAD_DATA")
-        private AvgRoadData avgRoadData;
-
-        @JsonProperty("ROAD_TRAFFIC_STTS")
-        private List<RoadTrafficItem> roadTrafficItems;
-    }
+//    @Getter
+//    @Setter
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class RoadTrafficStatus {
+//        @JsonProperty("AVG_ROAD_DATA")
+//        private AvgRoadData avgRoadData;
+//
+//        @JsonProperty("ROAD_TRAFFIC_STTS")
+//        private List<RoadTrafficItem> roadTrafficItems;
+//    }
 
     /**
      * "AVG_ROAD_DATA" 키에 해당하는 평균 도로 교통 데이터를 매핑하는 내부 클래스.
      */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class AvgRoadData {
-        @JsonProperty("ROAD_MSG")
-        private String roadMsg;
-
-        @JsonProperty("ROAD_TRAFFIC_IDX")
-        private String roadTrafficIdx;
-
-        @JsonProperty("ROAD_TRAFFIC_SPD")
-        private int roadTrafficSpd; // 속도 (정수)
-
-        @JsonProperty("ROAD_TRAFFIC_TIME")
-        private String roadTrafficTime;
-    }
+//    @Getter
+//    @Setter
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class AvgRoadData {
+//        @JsonProperty("ROAD_MSG")
+//        private String roadMsg;
+//
+//        @JsonProperty("ROAD_TRAFFIC_IDX")
+//        private String roadTrafficIdx;
+//
+//        @JsonProperty("ROAD_TRAFFIC_SPD")
+//        private int roadTrafficSpd; // 속도 (정수)
+//
+//        @JsonProperty("ROAD_TRAFFIC_TIME")
+//        private String roadTrafficTime;
+//    }
 
     /**
      * "ROAD_TRAFFIC_STTS" 배열 안에 있는 각 도로 링크별 교통 현황을 매핑하는 내부 클래스.
      */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class RoadTrafficItem {
-        @JsonProperty("LINK_ID") private String linkId;
-        @JsonProperty("ROAD_NM") private String roadNm;
-        @JsonProperty("START_ND_CD") private String startNdCd;
-        @JsonProperty("START_ND_NM") private String startNdNm;
-        @JsonProperty("START_ND_XY") private String startNdXy;
-        @JsonProperty("END_ND_CD") private String endNdCd;
-        @JsonProperty("END_ND_NM") private String endNdNm;
-        @JsonProperty("END_ND_XY") private String endNdXy;
-        @JsonProperty("DIST") private String dist; // 거리 (String으로 오는 경우)
-        @JsonProperty("SPD") private String spd; // 속도 (String으로 오는 경우)
-        @JsonProperty("IDX") private String idx; // 지수
-        @JsonProperty("XYLIST") private String xyList; // 좌표 리스트
-    }
+//    @Getter
+//    @Setter
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class RoadTrafficItem {
+//        @JsonProperty("LINK_ID") private String linkId;
+//        @JsonProperty("ROAD_NM") private String roadNm;
+//        @JsonProperty("START_ND_CD") private String startNdCd;
+//        @JsonProperty("START_ND_NM") private String startNdNm;
+//        @JsonProperty("START_ND_XY") private String startNdXy;
+//        @JsonProperty("END_ND_CD") private String endNdCd;
+//        @JsonProperty("END_ND_NM") private String endNdNm;
+//        @JsonProperty("END_ND_XY") private String endNdXy;
+//        @JsonProperty("DIST") private String dist; // 거리 (String으로 오는 경우)
+//        @JsonProperty("SPD") private String spd; // 속도 (String으로 오는 경우)
+//        @JsonProperty("IDX") private String idx; // 지수
+//        @JsonProperty("XYLIST") private String xyList; // 좌표 리스트
+//    }
 
 
 }

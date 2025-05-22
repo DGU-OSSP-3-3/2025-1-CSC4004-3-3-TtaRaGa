@@ -1,9 +1,8 @@
 package com.example.ttaraga.ttaraga.controller;
 
 
-import com.example.ttaraga.ttaraga.service.GraphhopperService;
+import com.example.ttaraga.ttaraga.service.Routing.GraphhopperService;
 import com.graphhopper.util.shapes.GHPoint;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+
+/*
+테스트용으로 만듬
+
+나중에 지우기
+ */
 
 @RestController
 @RequestMapping("/api/route")
@@ -50,6 +55,4 @@ public class testController {
             this.waypoints = waypoints;
         }
     }
-
-
 }
