@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface BikeRepository extends JpaRepository<Bike, Long> {
-    Optional<Bike> findByApiStationId(String apiStationId);
+public interface BikeRepository extends JpaRepository<Bike, String> {
+//public interface BikeRepository extends JpaRepository<Bike, Long> {
+//    Optional<Bike> findByApiStationId(String apiStationId);
 }

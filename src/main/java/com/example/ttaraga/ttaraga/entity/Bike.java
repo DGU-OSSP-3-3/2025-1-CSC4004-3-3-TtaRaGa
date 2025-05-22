@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Bike {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "stationId", nullable = false)
     private String stationId;
 
     @Column(nullable = false)
