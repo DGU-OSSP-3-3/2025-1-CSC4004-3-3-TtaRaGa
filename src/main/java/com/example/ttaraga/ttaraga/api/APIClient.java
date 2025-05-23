@@ -11,7 +11,7 @@ public class APIClient {
 
     @Value("${seoul.api.bike}")
     private String apiKey;
-            ;
+
     private final String baseUrl = "http://openapi.seoul.go.kr:8088";
 
     public APIClient(WebClient.Builder webClientBuilder) {
