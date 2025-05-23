@@ -75,6 +75,54 @@ public class GraphhopperService {
     }
 
 
+    public String getRouteGeoJson(GHPoint start, GHPoint end, List<GHPoint> optionalWaypoints) {
+        GHRequest request = new GHRequest();
+        request.setProfile("bike"); // 자전거 프로필 설정
+
+        // 출발지 추가
+        request.addPoint(start);
+
+        // 경유지 추가 (있는 경우)
+        if (optionalWaypoints != null && !optionalWaypoints.isEmpty()) {
+            for (GHPoint p : optionalWaypoints) {
+                request.addPoint(p);
+            }
+        }
+
+        // 도착지 추가
+        request.addPoint(end);
+
+        GHResponse response = hopper.route(request);
+
+        if (response.hasErrors()) {
+            // 에러 로깅 및 예외 처리
+            System.err.println("경로 요청 실패: " + response.getErrors());
+            throw new RuntimeException("경로 요청 실패: " + response.getErrors());
+        }
+
+        ResponsePath path = response.getBest();
+        PointList pointList = path.getPoints();
+
+        // GeoJSON LineString 문자열 생성
+        StringBuilder geoJson = new StringBuilder();
+        geoJson.append("{ \"type\": \"LineString\", \"coordinates\": [");
+
+        for (int i = 0; i < pointList.size(); i++) {
+            GHPoint point = pointList.get(i);
+            // GeoJSON은 [경도, 위도] 순서입니다.
+            geoJson.append("[")
+                    .append(point.lon).append(", ")
+                    .append(point.lat).append("]");
+            if (i < pointList.size() - 1) {
+                geoJson.append(", ");
+            }
+        }
+        geoJson.append("] }");
+
+        return geoJson.toString();
+    }
+
+
 //    GHRequest req = new GHRequest()
 //            .addPoint(startPoint)
 //            .addPoint(wayPoint1)
