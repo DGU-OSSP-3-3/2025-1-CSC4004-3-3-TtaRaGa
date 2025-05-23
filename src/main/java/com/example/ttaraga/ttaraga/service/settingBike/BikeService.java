@@ -50,18 +50,18 @@ public class BikeService {
                         }
                         List<BikeDto> bikeDTOs = objectMapper.convertValue(bikeStations, new TypeReference<List<BikeDto>>() {});
 
-                        // 디버깅: BikeDto의 parkingBikeTotCnt 출력
-                        bikeDTOs.forEach(dto -> System.out.println("BikeDto: stationId=" + dto.getStationId() + ", parkingBikeTotCnt=" + dto.getParkingBikeTotCnt()));
+                          // 디버깅: BikeDto의 parkingBikeTotCnt 출력
+//                        bikeDTOs.forEach(dto -> System.out.println("BikeDto: stationId=" + dto.getStationId() + ", parkingBikeTotCnt=" + dto.getParkingBikeTotCnt()));
 
-                        // 중복 stationId 제거 및 최신 데이터 유지
+                         // 중복 stationId 제거 및 최신 데이터 유지
                         Map<String, BikeDto> deduplicatedDTOs = bikeDTOs.stream()
                                 .collect(Collectors.toMap(
                                         BikeDto::getStationId,
                                         dto -> dto,
                                         (existing, replacement) -> {
-                                            System.out.println("중복 stationId 감지: " + existing.getStationId() +
-                                                    ", 기존 parkingBikeTotCnt=" + existing.getParkingBikeTotCnt() +
-                                                    ", 새 값=" + replacement.getParkingBikeTotCnt());
+//                                            System.out.println("중복 stationId 감지: " + existing.getStationId() +
+//                                                    ", 기존 parkingBikeTotCnt=" + existing.getParkingBikeTotCnt() +
+//                                                    ", 새 값=" + replacement.getParkingBikeTotCnt());
                                             return replacement; // 최신 데이터로 덮어씌움
                                         }
                                 ));
@@ -71,28 +71,28 @@ public class BikeService {
                                 .toList();
 
                         // 디버깅: Bike의 parkingBikeTotCnt 출력
-                        entities.forEach(entity -> System.out.println("Bike: stationId=" + entity.getStationId() + ", parkingBikeTotCnt=" + entity.getParkingBikeTotCnt()));
+//                        entities.forEach(entity -> System.out.println("Bike: stationId=" + entity.getStationId() + ", parkingBikeTotCnt=" + entity.getParkingBikeTotCnt()));
 
                         // 기존 데이터 확인 후 저장/업데이트
                         for (Bike entity : entities) {
                             try {
                                 Bike existing = bikeRepository.findById(entity.getStationId()).orElse(null);
                                 if (existing != null) {
-                                    System.out.println("기존 데이터 발견: stationId=" + existing.getStationId() +
-                                            ", 기존 parkingBikeTotCnt=" + existing.getParkingBikeTotCnt());
+//                                    System.out.println("기존 데이터 발견: stationId=" + existing.getStationId() +
+//                                            ", 기존 parkingBikeTotCnt=" + existing.getParkingBikeTotCnt());
                                     // 기존 데이터 업데이트
                                     existing.setStationName(entity.getStationName());
                                     existing.setParkingBikeTotCnt(entity.getParkingBikeTotCnt());
                                     existing.setStationLatitude(entity.getStationLatitude());
                                     existing.setStationLongitude(entity.getStationLongitude());
                                     bikeRepository.save(existing);
-                                    System.out.println("업데이트 완료: stationId=" + existing.getStationId() +
-                                            ", parkingBikeTotCnt=" + existing.getParkingBikeTotCnt());
+//                                    System.out.println("업데이트 완료: stationId=" + existing.getStationId() +
+//                                            ", parkingBikeTotCnt=" + existing.getParkingBikeTotCnt());
                                 } else {
                                     // 신규 데이터 저장
                                     bikeRepository.save(entity);
-                                    System.out.println("신규 저장: stationId=" + entity.getStationId() +
-                                            ", parkingBikeTotCnt=" + entity.getParkingBikeTotCnt());
+//                                    System.out.println("신규 저장: stationId=" + entity.getStationId() +
+//                                            ", parkingBikeTotCnt=" + entity.getParkingBikeTotCnt());
                                 }
                             } catch (Exception e) {
                                 System.err.println("저장 중 오류: stationId=" + entity.getStationId() + ", 오류: " + e.getMessage());
@@ -104,8 +104,8 @@ public class BikeService {
                         deduplicatedDTOs.keySet().forEach(stationId -> {
                             Bike saved = bikeRepository.findById(stationId).orElse(null);
                             if (saved != null) {
-                                System.out.println("DB 조회: stationId=" + stationId +
-                                        ", parkingBikeTotCnt=" + saved.getParkingBikeTotCnt());
+//                                System.out.println("DB 조회: stationId=" + stationId +
+//                                        ", parkingBikeTotCnt=" + saved.getParkingBikeTotCnt());
                             } else {
                                 System.out.println("DB 조회 실패: stationId=" + stationId + " 데이터 없음");
                             }
@@ -122,4 +122,31 @@ public class BikeService {
                     return Flux.error(e);
                 });
     }
+
+    // Entity를 DTO로 변환하는 헬퍼 메서드
+    private BikeDto convertToDto(Bike bike) {
+        BikeDto dto = new BikeDto();
+        dto.setStationId(bike.getStationId());
+        dto.setParkingBikeTotCnt(bike.getParkingBikeTotCnt());
+        dto.setStationLatitude(bike.getStationLatitude());
+        dto.setStationLongitude(bike.getStationLongitude());
+        dto.setStationName(bike.getStationName());
+        return dto;
+    }
+
+    // DB에서 모든 Bike entity 조회.
+    public List<BikeDto> getAllBikes () {
+        List<Bike> bikes = bikeRepository.findAll(); // findAll()은 JpaRepository의 기본 메서드
+        return bikes.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    public BikeDto getBikeStationById(Long id) {
+        // ID로 Bike 엔티티를 찾아서 DTO로 변환
+        return bikeRepository.findById(String.valueOf(id))
+                .map(this::convertToDto)
+                .orElse(null);
+    }
 }
+
