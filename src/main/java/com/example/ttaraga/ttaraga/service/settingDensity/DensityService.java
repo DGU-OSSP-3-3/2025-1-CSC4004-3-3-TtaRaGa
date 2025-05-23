@@ -62,7 +62,7 @@ public class DensityService {
                     // 4. 업데이트된 엔티티를 DB에 저장 (JPA는 변경 감지 후 자동으로 UPDATE 쿼리 실행)
                     densityAreaInfoRepository.save(areaInfo);
                     updatedCount++;
-                    System.out.println("업데이트 성공: 지역=" + areaNm + ", 밀집도 레벨=" + densityLevel);
+//                    System.out.println("업데이트 성공: 지역=" + areaNm + ", 밀집도 레벨=" + densityLevel);
                 } else {
                     System.err.println("API로부터 밀집도 레벨을 가져오지 못함 (지역: " + areaNm + "). 스킵합니다.");
                 }
@@ -72,7 +72,7 @@ public class DensityService {
                 // 필요하다면 이곳에서 롤백 로직을 추가하거나, 특정 오류에 대한 처리를 다르게 할 수 있습니다.
             }
         }
-        System.out.println("API를 통한 인구 밀집도 레벨 업데이트 완료. 총 " + updatedCount + "개 지역 업데이트.");
+//        System.out.println("API를 통한 인구 밀집도 레벨 업데이트 완료. 총 " + updatedCount + "개 지역 업데이트.");
     }
 }
 //구현 후 주석 지우고 @EnableScheduling 활성화 시키기

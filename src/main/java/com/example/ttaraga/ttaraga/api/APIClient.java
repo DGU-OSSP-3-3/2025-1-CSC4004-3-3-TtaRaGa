@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 public class APIClient {
     private final WebClient webClient;
 
-    @Value("${seoul.api.bike}")
+    @Value("${seoul.api.key}")
     private String apiKey;
 
     private final String baseUrl = "http://openapi.seoul.go.kr:8088";
