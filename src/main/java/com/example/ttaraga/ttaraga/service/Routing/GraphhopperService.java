@@ -12,11 +12,16 @@ GraphHopper Core API 호출 처리
 GraphHoopper 응답을 GeoJson으로 변환하자.
  */
 
+import com.example.ttaraga.ttaraga.GeoJsonExporter;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.ResponsePath;
+import com.graphhopper.util.Instruction;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
+import org.geotools.geojson.feature.FeatureJSON;
+import org.hibernate.query.sqm.tree.domain.SqmPathWrapper;
+import org.mariadb.jdbc.type.LineString;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geojson.feature.FeatureJSON;
@@ -29,6 +34,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.springframework.stereotype.Service;
 import com.graphhopper.GraphHopper;
 
+import java.awt.*;
 import java.awt.*;
 import java.io.StringWriter;
 import java.util.List;
