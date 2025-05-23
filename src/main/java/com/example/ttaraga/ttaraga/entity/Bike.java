@@ -1,20 +1,12 @@
 package com.example.ttaraga.ttaraga.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-/*
-서울 따릉이 엔티티
- */
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Bike {
     @Id
     @Column(name = "stationId", nullable = false)
