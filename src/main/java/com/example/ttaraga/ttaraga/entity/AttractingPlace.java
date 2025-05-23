@@ -4,24 +4,22 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-/*
-서울 매력, 동행 엔티티
- */
-
 @Entity
 @Getter
 @Setter
 public class AttractingPlace {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long j;
+    private String placeId;
+
+    @Column(name = "placeName", nullable = false)
+    private String placeName;
 
     @Column(nullable = false)
-    private double pointLatitude;
+    private double placeLatitude;
 
     @Column(nullable = false)
-    private double pointLongitude;
+    private double placeLongitude;
 
-    @Column(name = "pointName", nullable = false)
-    private String pointName;
+    @Column(name = "detail", nullable = false)
+    private String detail;
 }
