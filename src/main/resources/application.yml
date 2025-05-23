@@ -1,0 +1,7 @@
+# src/main/resources/application.yml
+
+route-evaluation:
+  slope-weight: 0.4
+  bike-lane-weight: 0.3
+  congestion-weight: 0.2
+  river-weight: 0.1

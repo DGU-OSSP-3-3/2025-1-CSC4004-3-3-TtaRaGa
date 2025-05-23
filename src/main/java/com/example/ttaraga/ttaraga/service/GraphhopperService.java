@@ -19,6 +19,7 @@ import com.graphhopper.ResponsePath;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
+import org.geotools.geojson.feature.FeatureJSON;
 import org.hibernate.query.sqm.tree.domain.SqmPathWrapper;
 import org.mariadb.jdbc.type.LineString;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import com.graphhopper.GraphHopper;
 import java.awt.*;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class GraphhopperService {
@@ -80,6 +82,20 @@ public class GraphhopperService {
         return null;
     }
 
+    // 단순 경로 요청
+    public Optional<ResponsePath> getPath(GHPoint from, GHPoint to) {
+        GHRequest request = new GHRequest(from, to).setProfile("bike").setLocale("ko");
+        GHResponse response = hopper.route(request);
+        return response.hasErrors() ? Optional.empty() : Optional.of(response.getBest());
+    }
+    public String convertToGeoJson(ResponsePath path) {
+        // FeatureJSON 활용해서 String으로 직렬화
+        FeatureJSON fjson = new FeatureJSON();
+//        SimpleFeatureType TYPE = ... // 미리 정의 필요
+//        SimpleFeature feature = ...  // path.getPoints()를 기반으로 변환 필요
+//        return fjson.toString(feature);
+        return "{}"; // 임시로 빈 JSON 반환
+    }
 
 //    GHRequest req = new GHRequest()
 //            .addPoint(startPoint)

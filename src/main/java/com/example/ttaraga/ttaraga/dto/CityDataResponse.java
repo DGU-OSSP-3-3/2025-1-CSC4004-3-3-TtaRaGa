@@ -15,26 +15,3 @@ public class CityDataResponse {
     private CityData cityData;
 }
 
-@Getter
-@Setter
-class CityData {
-    @JsonProperty("densityData")
-    private DensityData densityData;
-
-    @JsonProperty("bikeData")
-    private BikeData bikeData;
-}
-
-@Getter
-@Setter
-class DensityData {
-    @JsonProperty("row")
-    private List<Densitydto> row;
-}
-
-@Getter
-@Setter
-class BikeData {
-    @JsonProperty("row")
-    private List<Bikedto> row;
-}
