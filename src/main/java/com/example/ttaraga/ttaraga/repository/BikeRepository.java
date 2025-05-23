@@ -4,6 +4,7 @@ import com.example.ttaraga.ttaraga.entity.Bike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+//가지마ㅏ
 @Repository
 public interface BikeRepository extends JpaRepository<Bike, String> {
 }
