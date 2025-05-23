@@ -42,8 +42,8 @@ public class AttractingPlaceService {
                 // 셀 값 읽기
                 dto.setPlaceId(getStringCellValue(row.getCell(0), dataFormatter));
                 dto.setPlaceName(getStringCellValue(row.getCell(1), dataFormatter));
-                dto.setPlaceLatitude(getNumericCellValue(row.getCell(2), dataFormatter));
-                dto.setPlaceLongitude(getNumericCellValue(row.getCell(3), dataFormatter));
+                dto.setPlaceLongitude(getNumericCellValue(row.getCell(2), dataFormatter));
+                dto.setPlaceLatitude(getNumericCellValue(row.getCell(3), dataFormatter));
                 dto.setDetail(getStringCellValue(row.getCell(4), dataFormatter));
 
                 AttractingPlace place = dtoMapper.toAttractingPlaceEntity(dto);
