@@ -1,7 +1,6 @@
 package com.example.ttaraga.ttaraga.config;
 
 import com.graphhopper.GraphHopper;
-import com.graphhopper.isochrone.algorithm.*;
 import com.graphhopper.config.CHProfile;
 import com.graphhopper.config.Profile;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -10,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.Duration;
 import java.util.List;
 
 /*

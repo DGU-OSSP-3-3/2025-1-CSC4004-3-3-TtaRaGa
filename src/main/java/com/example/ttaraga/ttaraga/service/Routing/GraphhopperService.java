@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import com.graphhopper.GraphHopper;
 
 import java.awt.*;
-import java.awt.*;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
