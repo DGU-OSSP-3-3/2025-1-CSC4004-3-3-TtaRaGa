@@ -68,9 +68,9 @@ public class DensityNewAPIClient {
             conn.setConnectTimeout(5000); // 5초
             conn.setReadTimeout(5000);   // 5초
 
-            System.out.println("API 호출 URL: " + url.toString());
+//            System.out.println("API 호출 URL: " + url.toString());
             int responseCode = conn.getResponseCode();
-            System.out.println("API 응답 코드: " + responseCode);
+//            System.out.println("API 응답 코드: " + responseCode);
 
             // 응답 코드에 따라 InputStream 또는 ErrorStream 가져오기
             if (responseCode >= 200 && responseCode <= 300) {
@@ -86,7 +86,7 @@ public class DensityNewAPIClient {
             }
 
             String jsonResponse = sb.toString();
-            System.out.println("Full JSON Response:\n" + jsonResponse);
+//            System.out.println("Full JSON Response:\n" + jsonResponse);
 
             // ✅ Jackson ObjectMapper를 사용하여 JSON을 CityDataResponse DTO로 파싱
             CityDataResponse_NEW response = objectMapper.readValue(jsonResponse, CityDataResponse_NEW.class);
