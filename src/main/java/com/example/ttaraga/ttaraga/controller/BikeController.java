@@ -2,13 +2,16 @@ package com.example.ttaraga.ttaraga.controller;
 
 import com.example.ttaraga.ttaraga.dto.BikeDto;
 import com.example.ttaraga.ttaraga.service.settingBike.BikeService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@RequestMapping("/bike-info")
 @RestController
 public class BikeController {
     private final BikeService bikeService;
@@ -18,7 +21,7 @@ public class BikeController {
     }
 
     // 모든 따릉이 대여소 정보를 반환하는 GET 요청 처리
-    @GetMapping
+    @GetMapping(value = "/test", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<BikeDto>> getAllBikesInfo() {
         List<BikeDto> bikedtos = bikeService.getAllBikes();
         return ResponseEntity.ok(bikedtos);

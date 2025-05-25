@@ -110,6 +110,11 @@
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.osgeo</groupId>
+            <artifactId>proj4j</artifactId>
+            <version>0.1.0</version>
+        </dependency>
         <!-- ✅ GraphHopper core -->
         <dependency>
             <groupId>com.graphhopper</groupId>

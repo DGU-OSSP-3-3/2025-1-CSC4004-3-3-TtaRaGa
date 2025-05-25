@@ -24,7 +24,7 @@ DensityAreaInfo.xmlx 전용으로 작성했음
 public class ExcelReaderService {
 
     public List<DensityAreaInfo> readAreaInfoFromExcel(InputStream inputStream) throws Exception{
-        System.out.println("엑셀 읽는중 .,,,.");
+//        System.out.println("엑셀 읽는중 .,,,.");
         List<DensityAreaInfo> areaInfoList = new ArrayList<>();
 
         Workbook workbook = new XSSFWorkbook(inputStream);
@@ -47,7 +47,7 @@ public class ExcelReaderService {
                 continue;
             }
 
-            System.out.println("데이터 행 읽기: " + rowIndex);
+//            System.out.println("데이터 행 읽기: " + rowIndex);
 
             DensityAreaInfo areaInfo = new DensityAreaInfo();
             areaInfo.setCategory(getCellStringValue(row.getCell(0)));
