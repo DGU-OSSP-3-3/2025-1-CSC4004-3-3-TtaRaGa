@@ -1,0 +1,8 @@
+POST http://localhost:8080/api/route/best
+Content-Type: application/json
+
+{
+  "lat": 37.5665,
+  "lon": 126.9780,
+  "timeLimitMinutes": 20
+}
