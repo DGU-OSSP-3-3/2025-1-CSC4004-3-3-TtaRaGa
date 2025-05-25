@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 public class BikeController {
     private final BikeService bikeService;
-
     public BikeController(BikeService bikeService) {
         this.bikeService = bikeService;
     }
@@ -26,7 +25,6 @@ public class BikeController {
         List<BikeDto> bikedtos = bikeService.getAllBikes();
         return ResponseEntity.ok(bikedtos);
     }
-
     // 특정 ID의 자전거 대여소 정보를 반환하는 GET 요청 처리
     @GetMapping("/{id}")
     public ResponseEntity<BikeDto> getBikeStationById(@PathVariable Long id) {

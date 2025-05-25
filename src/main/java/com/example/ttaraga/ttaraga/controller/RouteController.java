@@ -3,7 +3,7 @@ package com.example.ttaraga.ttaraga.controller;
 import com.example.ttaraga.ttaraga.dto.RouteRequestDto;
 import com.example.ttaraga.ttaraga.dto.RouteResultDto;
 import com.example.ttaraga.ttaraga.service.MidpointCalculatorService;
-import com.example.ttaraga.ttaraga.service.RouteService;
+import com.example.ttaraga.ttaraga.service.Routing.RouteService;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.util.shapes.GHPoint;
 import org.springframework.http.HttpStatus;
