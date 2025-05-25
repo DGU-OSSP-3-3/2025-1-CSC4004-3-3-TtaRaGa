@@ -19,13 +19,20 @@ import com.graphhopper.ResponsePath;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.hibernate.query.sqm.tree.domain.SqmPathWrapper;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.mariadb.jdbc.type.LineString;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.springframework.stereotype.Service;
 import com.graphhopper.GraphHopper;
 
 import java.awt.*;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -89,12 +96,38 @@ public class GraphhopperService {
         return response.hasErrors() ? Optional.empty() : Optional.of(response.getBest());
     }
     public String convertToGeoJson(ResponsePath path) {
-        // FeatureJSON 활용해서 String으로 직렬화
-        FeatureJSON fjson = new FeatureJSON();
-//        SimpleFeatureType TYPE = ... // 미리 정의 필요
-//        SimpleFeature feature = ...  // path.getPoints()를 기반으로 변환 필요
-//        return fjson.toString(feature);
-        return "{}"; // 임시로 빈 JSON 반환
+        try {
+            // 1. 좌표 리스트 → JTS LineString으로 변환
+            PointList pointList = path.getPoints();
+            Coordinate[] coordinates = new Coordinate[pointList.size()];
+            for (int i = 0; i < pointList.size(); i++) {
+                coordinates[i] = new Coordinate(pointList.getLon(i), pointList.getLat(i));
+            }
+
+            GeometryFactory geometryFactory = new GeometryFactory();
+            org.locationtech.jts.geom.LineString lineString = geometryFactory.createLineString(coordinates);
+
+            // 2. Feature 타입 정의
+            SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+            builder.setName("Route");
+            builder.setCRS(null); // 좌표계 지정 안 함 (필요시 setCRS)
+            builder.add("the_geom", LineString.class);
+            SimpleFeatureType featureType = builder.buildFeatureType();
+
+            // 3. Feature 생성
+            SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
+            featureBuilder.add(lineString);
+            SimpleFeature feature = featureBuilder.buildFeature(null);
+
+            // 4. GeoJSON 직렬화
+            FeatureJSON fjson = new FeatureJSON();
+            StringWriter writer = new StringWriter();
+            fjson.writeFeature(feature, writer);
+            return writer.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException("GeoJSON 변환 실패", e);
+        }
     }
 
 //    GHRequest req = new GHRequest()

@@ -6,12 +6,16 @@ import com.example.ttaraga.ttaraga.service.MidpointCalculatorService;
 import com.example.ttaraga.ttaraga.service.RouteService;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.util.shapes.GHPoint;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/route")
+@Validated
 public class RouteController {
 
     private final RouteService routeService;
@@ -30,6 +34,28 @@ public class RouteController {
     public RouteResultDto bestRoute(@RequestBody RouteRequestDto request) {
         return routeService.findBestRoute(request.getStart(), request.getTimeLimitMinutes());
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public class CustomNotFoundException extends RuntimeException {
+        public CustomNotFoundException(String message) {
+            super(message);
+        }
+    }
+//    @PostMapping("/best")
+//    public ResponseEntity<?> bestRoute(@RequestBody RouteRequestDto requestDto) {
+//        try {
+//            RouteResponseDto result = routeService.findBestRoute(requestDto);
+//            return ResponseEntity.ok(result);
+//        } catch (IllegalStateException e) {
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body(Map.of("error", e.getMessage()));
+//        } catch (Exception e) {
+//            return ResponseEntity
+//                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Map.of("error", "서버 오류 발생: " + e.getMessage()));
+//        }
+//    }
 
     /**
      * 🧪 테스트용: 일정 시간 기준 도달 가능한 거리 내 중간 지점 계산 + 경로 정보 반환
@@ -52,7 +78,7 @@ public class RouteController {
         result.put("midpoint", mid);
         result.put("distance_km", path.getDistance() / 1000.0);
         result.put("time_minutes", path.getTime() / 60000.0);
-        result.put("points", path.getPoints().toLineString(false)); // GeoJSON 아님 주의
+        result.put("points", path.getPoints().toLineString(false)); // 단순한 좌표 배열
 
         return result;
     }

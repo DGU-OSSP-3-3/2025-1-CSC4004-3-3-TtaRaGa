@@ -1,17 +1,14 @@
 package com.example.ttaraga.ttaraga.dto;
 
 import com.graphhopper.util.shapes.GHPoint;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.util.List;
 
+@Data
+@AllArgsConstructor
 public class RouteResultDto {
-    private String geoJson;
-    private List<GHPoint> points;
-
-    public RouteResultDto(String geoJson, List<GHPoint> points) {
-        this.geoJson = geoJson;
-        this.points = points;
-    }
-
-    public String getGeoJson() { return geoJson; }
-    public List<GHPoint> getPoints() { return points; }
+    private String geoJson;           // 전체 경로의 GeoJSON 표현
+    private List<GHPoint> pathPoints; // 출발지와 도착지
 }
