@@ -1,7 +1,6 @@
-package com.example.ttaraga.ttaraga.service;
+package com.example.ttaraga.ttaraga.service.evaluation;
 
 import com.example.ttaraga.ttaraga.config.RouteEvaluationConfig;
-import com.example.ttaraga.ttaraga.service.evaluation.*;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;

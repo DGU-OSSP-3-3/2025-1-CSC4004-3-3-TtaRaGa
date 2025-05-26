@@ -7,9 +7,9 @@ package com.example.ttaraga.ttaraga.service.Routing;
 
 import com.example.ttaraga.ttaraga.dto.RouteResultDto;
 import com.example.ttaraga.ttaraga.exception.NoValidRouteFoundException;
-import com.example.ttaraga.ttaraga.service.CandidatePointGenerator;
-import com.example.ttaraga.ttaraga.service.CandidateRoute;
-import com.example.ttaraga.ttaraga.service.RouteEvaluationService;
+import com.example.ttaraga.ttaraga.service.evaluation.CandidatePointGenerator;
+import com.example.ttaraga.ttaraga.service.evaluation.CandidateRoute;
+import com.example.ttaraga.ttaraga.service.evaluation.RouteEvaluationService;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.util.shapes.GHPoint;
 import org.springframework.stereotype.Service;

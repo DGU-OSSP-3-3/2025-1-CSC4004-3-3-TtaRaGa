@@ -1,4 +1,4 @@
-package com.example.ttaraga.ttaraga.service;
+package com.example.ttaraga.ttaraga.service.evaluation;
 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;

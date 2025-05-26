@@ -1,6 +1,6 @@
 //package com.example.ttaraga.ttaraga;
 //
-//import com.example.ttaraga.ttaraga.service.RouteEvaluationService;
+//import com.example.ttaraga.ttaraga.service.evaluation.RouteEvaluationService;
 //
 //public class test {
 //    public static void main(String[] args) {
