@@ -64,43 +64,101 @@ public class RouteService {
         double speedMetersPerMinute = 250.0; // 시속 15km 기준
         double bufferRatio = 0.9;
 
-        // 왕복이므로 시간의 절반, 거기에 약간의 여유를 두기 위해 bufferRatio 적용
         double oneWayTime = timeLimitMinutes / 2.0;
         double adjustedTime = oneWayTime * bufferRatio;
-
         double radiusMeters = speedMetersPerMinute * adjustedTime;
 
         System.out.println("[DEBUG] 계산된 반경: " + radiusMeters + "m");
 
         List<GHPoint> candidates = candidatePointGenerator.generate(start, radiusMeters);
+        System.out.println("[DEBUG] 후보지 개수: " + candidates.size());
 
         List<CandidateRoute> results = new ArrayList<>();
 
         for (GHPoint dest : candidates) {
+            System.out.printf("[DEBUG] ▶ 후보지 탐색 중: [%s]\n", dest);
+
             Optional<ResponsePath> pathOpt = graphhopperService.getPath(start, dest);
-            if (pathOpt.isEmpty()) continue;
+
+            if (pathOpt.isEmpty()) {
+                System.out.println("[SKIP] 경로 생성 실패 - 해당 후보지로 가는 경로 없음");
+                continue;
+            }
+
             ResponsePath path = pathOpt.get();
-            if (path.getTime() > timeLimitMinutes * 60 * 1000) continue;
 
-            // ✅ 평가 먼저: ResponsePath 기반 평가 (Edge 정보 활용 가능)
+            double timeMin = path.getTime() / 60000.0;
+            if (timeMin > timeLimitMinutes) {
+                System.out.printf("[SKIP] 경로 소요 시간 초과 (%.2f분 > %d분)\n", timeMin, timeLimitMinutes);
+                continue;
+            }
+
             double score = routeEvaluationService.evaluateRoute(path);
-
-            // ✅ GeoJSON 변환은 그대로 (클라이언트 응답용)
             String geoJson = graphhopperService.convertToGeoJson(path);
 
-            System.out.println("[DEBUG] 경로 후보: 시작점 [" + start + "] → 도착점 [" + dest + "]");
-            System.out.println("[DEBUG] 생성된 geoJson: " + geoJson);
-            System.out.println("[DEBUG] 계산된 score: " + score);
+            System.out.println("[DEBUG] ✅ 유효한 후보지 추가: " + dest);
+            System.out.printf("[DEBUG] └ 시간: %.2f분 | 점수: %.4f\n", timeMin, score);
 
-            results.add(new CandidateRoute(dest, geoJson, score));
+            results.add(new CandidateRoute(dest, geoJson, score, path));
         }
 
-        System.out.println("[DEBUG] 루트 보내기 " + results.stream().max(Comparator.comparing(CandidateRoute::getScore)).map(r -> new RouteResultDto(r.getGeoJson(), List.of(start, r.getPoint()))));
+        if (results.isEmpty()) {
+            System.out.println("[ERROR] 유효한 후보 경로가 없습니다. ResponsePath 생성 실패 or 조건 불충족");
+        }
 
         return results.stream()
                 .max(Comparator.comparing(CandidateRoute::getScore))
-                .map(r -> new RouteResultDto(r.getGeoJson(), List.of(start, r.getPoint())))
+                .map(r -> new RouteResultDto(r.getGeoJson(), List.of(start, r.getPoint()), r.getPath()))
                 .orElseThrow(() -> new NoValidRouteFoundException("유효한 루트를 찾을 수 없습니다."));
+    }
+
+    public List<CandidateRoute> findCandidateRoutes(GHPoint start, int timeLimitMinutes) {
+        double speedMetersPerMinute = 250.0; // 시속 15km 기준
+        double bufferRatio = 0.9;
+
+        double oneWayTime = timeLimitMinutes / 2.0;
+        double adjustedTime = oneWayTime * bufferRatio;
+        double radiusMeters = speedMetersPerMinute * adjustedTime;
+
+        System.out.println("[DEBUG] 계산된 반경: " + radiusMeters + "m");
+
+        List<GHPoint> candidates = candidatePointGenerator.generate(start, radiusMeters);
+        System.out.println("[DEBUG] 후보지 개수: " + candidates.size());
+
+        List<CandidateRoute> results = new ArrayList<>();
+
+        for (GHPoint dest : candidates) {
+            System.out.printf("[DEBUG] ▶ 후보지 탐색 중: [%s]\n", dest);
+
+            Optional<ResponsePath> pathOpt = graphhopperService.getPath(start, dest);
+
+            if (pathOpt.isEmpty()) {
+                System.out.println("[SKIP] 경로 생성 실패 - 해당 후보지로 가는 경로 없음");
+                continue;
+            }
+
+            ResponsePath path = pathOpt.get();
+
+            double timeMin = path.getTime() / 60000.0;
+            if (timeMin > timeLimitMinutes) {
+                System.out.printf("[SKIP] 경로 소요 시간 초과 (%.2f분 > %d분)\n", timeMin, timeLimitMinutes);
+                continue;
+            }
+
+            double score = routeEvaluationService.evaluateRoute(path);
+            String geoJson = graphhopperService.convertToGeoJson(path);
+
+            System.out.println("[DEBUG] ✅ 유효한 후보지 추가: " + dest);
+            System.out.printf("[DEBUG] └ 시간: %.2f분 | 점수: %.4f\n", timeMin, score);
+
+            results.add(new CandidateRoute(dest, geoJson, score, path));
+        }
+
+        if (results.isEmpty()) {
+            System.out.println("[ERROR] 유효한 후보 경로가 없습니다. ResponsePath 생성 실패 or 조건 불충족");
+        }
+
+        return results;
     }
 
 

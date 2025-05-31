@@ -6,8 +6,10 @@ import com.example.ttaraga.ttaraga.dto.RouteResultDto;
 import com.example.ttaraga.ttaraga.service.evaluation.MidpointCalculatorService;
 import com.example.ttaraga.ttaraga.service.Routing.GraphhopperService;
 import com.example.ttaraga.ttaraga.service.Routing.RouteService;
+import com.example.ttaraga.ttaraga.service.evaluation.RouteChainBuilder;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.util.shapes.GHPoint;
+import org.locationtech.jts.geom.Coordinate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,21 +25,32 @@ public class RouteController {
     private final RouteService routeService;
     private final MidpointCalculatorService midpointService;
     private final GraphhopperService graphhopperService;
+    private final RouteChainBuilder routeChainBuilder;
 
 
-    public RouteController(RouteService routeService, MidpointCalculatorService midpointService, GraphhopperService graphhopperService) {
+    public RouteController(RouteService routeService, MidpointCalculatorService midpointService, GraphhopperService graphhopperService,
+                           RouteChainBuilder routeChainBuilder) {
         this.routeService = routeService;
         this.midpointService = midpointService;
         this.graphhopperService = graphhopperService;
+        this.routeChainBuilder = routeChainBuilder;
     }
 
     /**
      * ✅ 목적: 출발지 기준 일정 시간 내 갈 수 있는 가장 점수 높은 지점 경로 추천
      * 🔗 POST /api/route/best
      */
+    @PostMapping("/best/single")
+    public RouteResultDto bestRouteSingle(@RequestBody RouteRequestDto request) {
+        return routeService.findBestRoute(request.getStart(), request.getTimeLimitMinutes());
+    }
+
     @PostMapping("/best")
     public RouteResultDto bestRoute(@RequestBody RouteRequestDto request) {
-        return routeService.findBestRoute(request.getStart(), request.getTimeLimitMinutes());
+        Coordinate start = new Coordinate(request.getLon(), request.getLat());
+        double timeLimit = request.getTimeLimitMinutes();
+
+        return routeChainBuilder.buildChainedRoute(start, timeLimit);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
