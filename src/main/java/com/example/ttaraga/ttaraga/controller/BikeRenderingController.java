@@ -16,11 +16,11 @@ public class BikeRenderingController {
         this.bikeRepository = bikeRepository;
     }
 
-    @PostMapping
+    @PostMapping("/info")
     public ResponseEntity<List<Object[]>> getStation(@RequestBody BikeRequestDto requestDto) {
         try{
             List<Object[]> response = bikeRepository.findStationsInBounds(
-                    requestDto.lat1(), requestDto.lng1(), requestDto.delta1(), requestDto.delta2());
+                    requestDto.lat(), requestDto.lon(), requestDto.delta1(), requestDto.delta2());
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);

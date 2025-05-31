@@ -12,7 +12,9 @@ import java.util.Optional;
 public interface BikeRepository extends JpaRepository<Bike, String> {
 //public interface BikeRepository extends JpaRepository<Bike, Long> {
 //    Optional<Bike> findByApiStationId(String apiStationId);
-@Query(value = """
+    Optional<Bike> findByStationName(String stationName);
+
+    @Query(value = """
         SELECT station_id, parking_bike_tot_cnt, station_latitude, station_longitude, station_name, COUNT(*) over() as station_count
         FROM bike
         WHERE station_latitude BETWEEN LEAST(:lat1, :lat1 + :delta1) AND GREATEST(:lat1, :lat1 + :delta1)
