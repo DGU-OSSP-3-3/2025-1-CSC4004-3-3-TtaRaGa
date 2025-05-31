@@ -49,39 +49,46 @@ public class RouteEvaluationService {
         }
 
         GeometryFactory geometryFactory = new GeometryFactory();
+        Coordinate[] coords = new Coordinate[points.size()];
+        for (int i = 0; i < points.size(); i++) {
+            coords[i] = new Coordinate(points.getLon(i), points.getLat(i)); // GraphHopper는 (lon, lat) 순서
+        }
 
-        for (int i = 0; i < points.size() - 1; i++) {
-            Coordinate a = new Coordinate(points.getLon(i), points.getLat(i));
-            Coordinate b = new Coordinate(points.getLon(i + 1), points.getLat(i + 1));
+        for (int i = 0; i < coords.length - 1; i++) {
+            Coordinate a = coords[i];
+            Coordinate b = coords[i + 1];
 
-            double segmentDistance = a.distance(b); // 유클리드 거리 (간략화)
-            if (segmentDistance == 0) continue;
-
-            double slopeScore = slopeEvaluator.evaluate(a) * config.getSlopeWeight();
-            double sceneryScore = sceneryEvaluator.evaluate(a) * config.getSceneryWeight();
-
-            // ✅ LineString 생성 후 평가
             LineString segment = geometryFactory.createLineString(new Coordinate[]{a, b});
-            double bikeScore = bikePathEvaluator.evaluate(segment) * config.getBikePathWeight();
+            double segmentLength = segment.getLength();
+            if (segmentLength == 0.0) continue;
 
-            double segmentScore = slopeScore - sceneryScore + bikeScore;
+            double slopeScore = 0.0;
+            //slopeEvaluator.evaluate(segment);
+            double sceneryScore = 0.0;
+            // sceneryEvaluator.evaluate(segment);
+            double bikeScore = bikePathEvaluator.evaluate(segment);
 
-            totalScore += segmentScore * segmentDistance;
-            totalDistance += segmentDistance;
-            System.out.printf(
-                    "[SCORE] 거리: %.1fm, 경사: %.2f, 경치: %.2f, 자전거도로: %.2f, 총합: %.2f\n",
-                    segmentDistance, slopeScore, sceneryScore, bikeScore, segmentScore
-            );
+            double finalSegmentScore =
+                    slopeScore * config.getSlopeWeight()
+                            + sceneryScore * config.getSceneryWeight()
+                            + bikeScore * config.getBikePathWeight();
+
+            totalScore += finalSegmentScore * segmentLength;
+            totalDistance += segmentLength;
+
         }
 
         if (totalDistance == 0) {
             throw new IllegalArgumentException("총 거리 0. 유효한 경로가 아닙니다.");
         }
 
+        double routeScore = totalScore / totalDistance;
+        System.out.printf("[TOTAL] 전체 거리: %.2fm | 전체 경로 점수: %.4f%n",
+                totalDistance * 111_000, routeScore
+        );
 
-        return totalScore / totalDistance;
+        return routeScore;
     }
-
     /**
      * 중간 좌표를 구해서 평가에 사용할 수 있도록 변환
      */
