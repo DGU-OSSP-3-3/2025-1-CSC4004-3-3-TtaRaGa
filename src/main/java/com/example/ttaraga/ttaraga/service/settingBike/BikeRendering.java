@@ -26,8 +26,8 @@ public class BikeRendering {
         List<Object[]> results = bikeRepository.findStationsInBounds(lat1, lng1, delta1, delta2);
 
         // Object[]를 Dto로 변환
-        List<BikeResponseDto.BikeDto> stations = results.stream()
-                .map(row -> new BikeResponseDto.BikeDto(
+        List<BikeResponseDto.ResponseBikeDto> stations = results.stream()
+                .map(row -> new BikeResponseDto.ResponseBikeDto(
                         (String) row[0],                  // stationId
                         ((Number) row[1]).longValue(),    // parkingBikeTotCnt
                         (Double) row[2],                  // stationLatitude

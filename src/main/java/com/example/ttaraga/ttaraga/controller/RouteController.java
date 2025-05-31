@@ -76,7 +76,7 @@ public class RouteController {
         GHPoint startPoint = new GHPoint(37.5665, 126.9780);
 
         // 경유지: 광화문광장 부근 (임의의 위치)
-        //나중에 포인트고르는 알고리즘을 통해 waypoints 리턴 해주기
+        //나중에 포인트 고르는 알고리즘을 통해 waypoints 리턴 해주기
         List<GHPoint> waypoints = new ArrayList<>();
         waypoints.add(new GHPoint(37.5750, 126.9770)); // 광화문광장 대략적인 위도, 경도
 
@@ -135,7 +135,6 @@ public class RouteController {
         if (request.getStart() == null || request.getEnd() == null) {
             return ResponseEntity.badRequest().body("{\"error\": \"출발점과 도착점은 필수입니다.\"}");
         }
-
         try {
             // GraphhopperService를 호출하여 경로 계산
             // 경유지가 없으면 null 또는 빈 리스트가 서비스로 전달됩니다.
