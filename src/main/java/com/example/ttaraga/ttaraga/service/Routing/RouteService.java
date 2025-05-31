@@ -61,7 +61,19 @@ public class RouteService {
     public RouteResultDto findBestRoute(GHPoint start, int timeLimitMinutes) {
         System.out.println("[DEBUG] 요청 받은 시작점: [" + start + "] / 시간 제한: " + timeLimitMinutes + "분");
 
-        List<GHPoint> candidates = candidatePointGenerator.generate(start, 2000); // 2km 기준
+        double speedMetersPerMinute = 250.0; // 시속 15km 기준
+        double bufferRatio = 0.9;
+
+        // 왕복이므로 시간의 절반, 거기에 약간의 여유를 두기 위해 bufferRatio 적용
+        double oneWayTime = timeLimitMinutes / 2.0;
+        double adjustedTime = oneWayTime * bufferRatio;
+
+        double radiusMeters = speedMetersPerMinute * adjustedTime;
+
+        System.out.println("[DEBUG] 계산된 반경: " + radiusMeters + "m");
+
+        List<GHPoint> candidates = candidatePointGenerator.generate(start, radiusMeters);
+
         List<CandidateRoute> results = new ArrayList<>();
 
         for (GHPoint dest : candidates) {
@@ -70,12 +82,16 @@ public class RouteService {
             ResponsePath path = pathOpt.get();
             if (path.getTime() > timeLimitMinutes * 60 * 1000) continue;
 
+            // ✅ 평가 먼저: ResponsePath 기반 평가 (Edge 정보 활용 가능)
+            double score = routeEvaluationService.evaluateRoute(path);
+
+            // ✅ GeoJSON 변환은 그대로 (클라이언트 응답용)
             String geoJson = graphhopperService.convertToGeoJson(path);
 
             System.out.println("[DEBUG] 경로 후보: 시작점 [" + start + "] → 도착점 [" + dest + "]");
             System.out.println("[DEBUG] 생성된 geoJson: " + geoJson);
+            System.out.println("[DEBUG] 계산된 score: " + score);
 
-            double score = routeEvaluationService.evaluateRoute(geoJson);
             results.add(new CandidateRoute(dest, geoJson, score));
         }
 

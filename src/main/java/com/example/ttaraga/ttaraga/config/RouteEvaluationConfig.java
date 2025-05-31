@@ -11,6 +11,7 @@ public class RouteEvaluationConfig {
     private double sceneryWeight;
     private double congestionWeight;
     private double weatherWeight;
+    private double bikePathWeight;
 
     public double getSlopeWeight() {
         return slopeWeight;
@@ -43,4 +44,14 @@ public class RouteEvaluationConfig {
     public void setWeatherWeight(double weatherWeight) {
         this.weatherWeight = weatherWeight;
     }
+
+    public double getBikePathWeight() {
+        return bikePathWeight;
+    }
+
+    public void setBikePathWeightWeight(double bikePathWeight) {
+        this.bikePathWeight = bikePathWeight;
+    }
+
+
 }
