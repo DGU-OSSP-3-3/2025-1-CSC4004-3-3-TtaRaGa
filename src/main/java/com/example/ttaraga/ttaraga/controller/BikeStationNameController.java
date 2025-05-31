@@ -15,7 +15,7 @@ public class BikeStationNameController {
         this.bikeStationNameService = bikeStationNameService;
     }
 
-    @PostMapping("/point")
+    @PostMapping("/location")
     public ResponseEntity<StationNameResponseDto> getBikeStationName(@RequestBody StationNameRequestDto stationNameRequestDto){
         try{
             StationNameResponseDto response = bikeStationNameService.getStationNameByStationId(stationNameRequestDto.stationName());
