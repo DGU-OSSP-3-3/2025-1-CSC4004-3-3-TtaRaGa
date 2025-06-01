@@ -1,9 +1,20 @@
 {
-  "priority": [
-    {
-      "if": "road_access != DESTINATION",
-      "multiply_by": 1.0
+  "speed" : [ {
+    "if" : "in_congested_zones",
+    "multiply_by" : 0.5
+  }, {
+    "if" : "in_congested_zones",
+    "limit_to" : 30
+  } ],
+  "priority" : [ {
+    "if" : "in_congested_zones",
+    "multiply_by" : 0.3
+  } ],
+  "distance_influence" : 100,
+  "areas" : {
+    "congested_zones" : {
+      "type" : "FeatureCollection",
+      "features" : [ ]
     }
-  ],
-  "speed": []
+  }
 }
