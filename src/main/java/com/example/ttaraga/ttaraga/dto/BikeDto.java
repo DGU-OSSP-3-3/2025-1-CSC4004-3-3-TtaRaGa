@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import com.example.ttaraga.ttaraga.utility.StringToLongDeserializer;
 
+import java.util.List;
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BikeDto {
@@ -24,4 +26,5 @@ public class BikeDto {
 
     @JsonProperty("stationName")
     private String stationName;
+
 }

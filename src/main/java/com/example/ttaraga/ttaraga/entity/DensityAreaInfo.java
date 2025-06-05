@@ -27,7 +27,7 @@ public class DensityAreaInfo {
 
     private String engNm; //영어이름
 
-    private String DensityLevel; //밀집도 레벨
+    private String densityLevel; //밀집도 레벨
 
     private Double latitude ; //위도
 

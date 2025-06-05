@@ -9,19 +9,19 @@ import lombok.Setter;
 @Setter
 public class Bike {
     @Id
-    @Column(name = "stationId", nullable = false)
+    @Column(name = "station_id", nullable = false)
     private String stationId;
 
-    @Column(nullable = false)
+    @Column(name = "parking_bike_tot_cnt", nullable = false)
     private long parkingBikeTotCnt;
 
-    @Column(nullable = false)
+    @Column(name = "station_latitude", nullable = false)
     private double stationLatitude;
 
-    @Column(nullable = false)
+    @Column(name = "station_longitude", nullable = false)
     private double stationLongitude;
 
-    @Column(name = "stationName", nullable = false)
+    @Column(name = "station_name", nullable = false)
     private String stationName;
 }
 
