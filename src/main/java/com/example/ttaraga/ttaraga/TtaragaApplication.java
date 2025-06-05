@@ -14,5 +14,4 @@ public class TtaragaApplication {
         // Spring 애플리케이션 실행
         SpringApplication.run(TtaragaApplication.class, args);
     }
-
 }

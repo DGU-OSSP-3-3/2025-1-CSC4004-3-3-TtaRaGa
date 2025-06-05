@@ -16,6 +16,10 @@ import com.example.ttaraga.ttaraga.dto.BikeDto;
 import com.example.ttaraga.ttaraga.api.APIClient;
 import com.example.ttaraga.ttaraga.mapper.DtoMapper;
 import com.example.ttaraga.ttaraga.repository.BikeRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class BikeService {
     @Autowired
@@ -143,4 +147,5 @@ public class BikeService {
                 .map(this::convertToDto)
                 .orElse(null);
     }
+
 }

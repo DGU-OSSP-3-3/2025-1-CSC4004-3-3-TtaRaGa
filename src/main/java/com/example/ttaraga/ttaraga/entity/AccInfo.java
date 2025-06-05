@@ -16,15 +16,15 @@ public class AccInfo {
     @Column(name = "acc_id", nullable = false)
     private String acc_id;
 
-    @Column
+    @Column(name = "acc_time", nullable = false)
     private String occr_time;
 
-    @Column(nullable=false)
+    @Column(name = "acc_info", nullable=false)
     private String acc_info;
 
-    @Column(nullable = false)
+    @Column(name = "acc_latitude", nullable = false)
     private double acc_latitude;
 
-    @Column(nullable = false)
+    @Column(name = "acc_longitude", nullable = false)
     private double acc_longitude;
 }

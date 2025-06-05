@@ -13,15 +13,16 @@ import lombok.Setter;
 @Setter
 public class AttractingPlace {
     @Id
+    @Column(name="place_id", nullable=false)
     private String placeId;
 
-    @Column(name = "placeName", nullable = false)
+    @Column(name = "place_name", nullable = false)
     private String placeName;
 
-    @Column(nullable = false)
+    @Column(name = "place_latitude", nullable = false)
     private double placeLatitude;
 
-    @Column(nullable = false)
+    @Column(name ="place_longitude", nullable = false)
     private double placeLongitude;
 
     @Column(name = "detail", nullable = false)

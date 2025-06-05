@@ -27,9 +27,12 @@ public class DensityAreaInfo {
 
     private String engNm; //영어이름
 
-    private String DensityLevel; //밀집도 레벨
+    private String densityLevel; //밀집도 레벨
 
     private Double latitude ; //위도
 
     private Double longitude; //경도
+
+    @Column(columnDefinition = "TEXT")
+    private String GeoJson; //지역 범위 정의
 }
