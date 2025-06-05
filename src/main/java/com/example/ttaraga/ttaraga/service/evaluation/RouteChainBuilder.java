@@ -1,7 +1,7 @@
 package com.example.ttaraga.ttaraga.service.evaluation;
 
 import com.example.ttaraga.ttaraga.dto.BestRouteResultDto;
-import com.example.ttaraga.ttaraga.dto.RouteResultDto;
+import com.example.ttaraga.ttaraga.dto.RouteResultDtoTemp;
 import com.example.ttaraga.ttaraga.service.Routing.RouteService;
 import com.graphhopper.ResponsePath;
 import com.graphhopper.util.shapes.GHPoint;
@@ -27,7 +27,7 @@ public class RouteChainBuilder {
         this.routeEvaluationService = routeEvaluationService;
     }
 
-    public RouteResultDto buildChainedRoute(Coordinate start, double totalTimeMinutes) {
+    public RouteResultDtoTemp buildChainedRoute(Coordinate start, double totalTimeMinutes) {
         List<GHPoint> chainedPoints = new ArrayList<>();
         List<ResponsePath> chainedPaths = new ArrayList<>();
         JSONArray geoJsonFeatures = new JSONArray();
@@ -93,14 +93,14 @@ public class RouteChainBuilder {
             }
 
             // p2 → p3
-            RouteResultDto segment1 = routeService.findBestRouteBetween(p2, p3);
+            RouteResultDtoTemp segment1 = routeService.findBestRouteBetween(p2, p3);
             if (segment1 != null && segment1.getResponsePath() != null) {
                 chainedPaths.add(segment1.getResponsePath());
                 geoJsonFeatures.add(parseGeoJsonFeature(segment1.getGeoJson()));
             }
 
             // p3 → p0 (복귀)
-            RouteResultDto segment2 = routeService.findBestRouteBetween(p3, p0);
+            RouteResultDtoTemp segment2 = routeService.findBestRouteBetween(p3, p0);
             if (segment2 != null && segment2.getResponsePath() != null) {
                 chainedPaths.add(segment2.getResponsePath());
                 geoJsonFeatures.add(parseGeoJsonFeature(segment2.getGeoJson()));
@@ -109,7 +109,7 @@ public class RouteChainBuilder {
             // 최소 경유지가 부족해도 반드시 p0로 귀환
             GHPoint lastPoint = chainedPoints.get(chainedPoints.size() - 1);
             if (!lastPoint.equals(p0)) {
-                RouteResultDto returnSegment = routeService.findBestRouteBetween(lastPoint, p0);
+                RouteResultDtoTemp returnSegment = routeService.findBestRouteBetween(lastPoint, p0);
                 if (returnSegment != null && returnSegment.getResponsePath() != null) {
                     chainedPaths.add(returnSegment.getResponsePath());
                     geoJsonFeatures.add(parseGeoJsonFeature(returnSegment.getGeoJson()));
@@ -141,7 +141,7 @@ public class RouteChainBuilder {
 
         // ✅ 중복 제거 후 반환
         List<GHPoint> dedupedPoints = new ArrayList<>(new LinkedHashSet<>(chainedPoints));
-        return new RouteResultDto(mergedGeoJson, dedupedPoints, last);
+        return new RouteResultDtoTemp(mergedGeoJson, dedupedPoints, last);
     }
 
 
@@ -156,10 +156,8 @@ public class RouteChainBuilder {
 
             for (Object f : features) {
                 JSONObject feature = (JSONObject) f;
-                JSONObject properties = (JSONObject) feature.get("properties");
-                JSONObject geom = (JSONObject) properties.get("the_geom");
-
-                JSONArray coords = (JSONArray) geom.get("coordinates");
+                JSONObject geometry = (JSONObject) feature.get("geometry");
+                JSONArray coords = (JSONArray) geometry.get("coordinates");
                 for (Object coord : coords) {
                     mergedCoords.add(coord);  // 좌표 배열에 통합
                 }

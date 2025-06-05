@@ -5,7 +5,7 @@ package com.example.ttaraga.ttaraga.service.Routing;
 아래의 서비스들을 조합해서 최종 결과를 반환
  */
 
-import com.example.ttaraga.ttaraga.dto.RouteResultDto;
+import com.example.ttaraga.ttaraga.dto.RouteResultDtoTemp;
 import com.example.ttaraga.ttaraga.exception.NoValidRouteFoundException;
 import com.example.ttaraga.ttaraga.service.evaluation.CandidatePointGenerator;
 import com.example.ttaraga.ttaraga.service.evaluation.CandidateRoute;
@@ -58,7 +58,7 @@ public class RouteService {
 //                .orElseThrow(() -> new NoValidRouteFoundException("조건을 만족하는 루트를 찾을 수 없습니다."));
 //    }
 
-    public RouteResultDto findBestRoute(GHPoint start, int timeLimitMinutes) {
+    public RouteResultDtoTemp findBestRoute(GHPoint start, int timeLimitMinutes) {
         System.out.println("[DEBUG] 요청 받은 시작점: [" + start + "] / 시간 제한: " + timeLimitMinutes + "분");
 
         double speedMetersPerMinute = 250.0; // 시속 15km 기준
@@ -108,11 +108,11 @@ public class RouteService {
 
         return results.stream()
                 .max(Comparator.comparing(CandidateRoute::getScore))
-                .map(r -> new RouteResultDto(r.getGeoJson(), List.of(start, r.getPoint()), r.getPath()))
+                .map(r -> new RouteResultDtoTemp(r.getGeoJson(), List.of(start, r.getPoint()), r.getPath()))
                 .orElseThrow(() -> new NoValidRouteFoundException("유효한 루트를 찾을 수 없습니다."));
     }
 
-    public RouteResultDto findBestRouteBetween(GHPoint start, GHPoint end) {
+    public RouteResultDtoTemp findBestRouteBetween(GHPoint start, GHPoint end) {
         System.out.printf("[DEBUG] findBestRoute(start, end) 호출: 시작점 = [%s], 도착점 = [%s]\n", start, end);
 
         Optional<ResponsePath> pathOpt = graphhopperService.getPath(start, end);
@@ -128,7 +128,7 @@ public class RouteService {
         System.out.printf("[DEBUG] ✅ 두 지점 경로 생성 완료 | 거리: %.2fm | 시간: %.2f분 | 점수: %.4f\n",
                 path.getDistance(), path.getTime() / 60000.0, score);
 
-        return new RouteResultDto(geoJson, List.of(start, end), path);
+        return new RouteResultDtoTemp(geoJson, List.of(start, end), path);
     }
 
     public List<CandidateRoute> findCandidateRoutes(GHPoint start, int timeLimitMinutes) {
@@ -182,3 +182,5 @@ public class RouteService {
 
 
 }
+
+

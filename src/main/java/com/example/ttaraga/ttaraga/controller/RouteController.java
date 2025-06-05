@@ -1,20 +1,16 @@
 package com.example.ttaraga.ttaraga.controller;
 
-import com.example.ttaraga.ttaraga.dto.RouteSearchRequestDto;
+import com.example.ttaraga.ttaraga.dto.RouteRequestDto;
+import com.example.ttaraga.ttaraga.dto.RouteResultDtoTemp;
 import com.example.ttaraga.ttaraga.service.Alg2.WayPointSelectionService;
 import com.example.ttaraga.ttaraga.service.evaluation.MidpointCalculatorService;
 import com.example.ttaraga.ttaraga.service.Routing.GraphhopperService;
 import com.example.ttaraga.ttaraga.service.Routing.RouteService;
 import com.example.ttaraga.ttaraga.service.evaluation.RouteChainBuilder;
-import com.graphhopper.ResponsePath;
-import com.graphhopper.util.shapes.GHPoint;
 import org.locationtech.jts.geom.Coordinate;
 import com.example.ttaraga.ttaraga.dto.Alg2.RouteResultDto;
 
-import com.graphhopper.ResponsePath;
-import com.graphhopper.util.shapes.GHPoint;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +31,7 @@ public class RouteController {
 
     @Autowired
     public RouteController(RouteService routeService, MidpointCalculatorService midpointService, GraphhopperService graphhopperService,
-                           RouteChainBuilder routeChainBuilder) {
+                           RouteChainBuilder routeChainBuilder, WayPointSelectionService wayPointSelectionService) {
         this.routeService = routeService;
         this.midpointService = midpointService;
         this.graphhopperService = graphhopperService;
@@ -110,17 +106,18 @@ public class RouteController {
      * 🔗 GET /api/route/recommend?lat=...&lon=...&time=...
      */
     @PostMapping("/best/single")
-    public RouteResultDto bestRouteSingle(@RequestBody RouteRequestDto request) {
+    public RouteResultDtoTemp bestRouteSingle(@RequestBody RouteRequestDto request) {
         return routeService.findBestRoute(request.getStart(), request.getTimeLimitMinutes());
     }
 
     @PostMapping("/best")
-    public RouteResultDto bestRoute(@RequestBody RouteRequestDto request) {
+    public RouteResultDtoTemp bestRoute(@RequestBody RouteRequestDto request) {
         Coordinate start = new Coordinate(request.getLon(), request.getLat());
         double timeLimit = request.getTimeLimitMinutes();
 
         return routeChainBuilder.buildChainedRoute(start, timeLimit);
     }
+}
 
 //    @PostMapping("/best")
 //    public ResponseEntity<?> bestRoute(@RequestBody RouteRequestDto requestDto) {
