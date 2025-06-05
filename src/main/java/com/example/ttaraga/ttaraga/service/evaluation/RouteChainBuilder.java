@@ -222,8 +222,10 @@ public class RouteChainBuilder {
 //        }
         for (int i = 0; i < chainedPaths.size(); i++) {
             ResponsePath path = chainedPaths.get(i);
-            totalDistance += path.getDistance();
-            double segmentDuration = path.getTime() / 60000.0;
+            double distance = path.getDistance(); // meter
+            totalDistance += distance;
+
+            double segmentDuration = distance / 3.33 / 60.0;  // 따릉이 속도 (12km/h) 기준
             totalDuration += segmentDuration;
 
             // 경사도 계산
