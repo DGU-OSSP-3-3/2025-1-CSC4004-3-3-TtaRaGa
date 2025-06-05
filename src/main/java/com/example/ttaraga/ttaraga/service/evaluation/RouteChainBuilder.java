@@ -1,14 +1,21 @@
 package com.example.ttaraga.ttaraga.service.evaluation;
 
+import com.example.ttaraga.ttaraga.dto.Alg2.RouteInfoDto;
+import com.example.ttaraga.ttaraga.dto.Alg2.SlopeDto;
 import com.example.ttaraga.ttaraga.dto.BestRouteResultDto;
 import com.example.ttaraga.ttaraga.dto.RouteResultDtoTemp;
+import com.example.ttaraga.ttaraga.service.Alg2.CalculateAvrSlope;
+import com.example.ttaraga.ttaraga.service.Routing.GraphhopperService;
 import com.example.ttaraga.ttaraga.service.Routing.RouteService;
+import com.graphhopper.GHResponse;
 import com.graphhopper.ResponsePath;
+import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.locationtech.jts.geom.Coordinate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,13 +28,15 @@ public class RouteChainBuilder {
 
     private final RouteService routeService;
     private final RouteEvaluationService routeEvaluationService;
+    @Autowired
+    private GraphhopperService graphhopperService;
 
     public RouteChainBuilder(RouteService routeService, RouteEvaluationService routeEvaluationService) {
         this.routeService = routeService;
         this.routeEvaluationService = routeEvaluationService;
     }
 
-    public RouteResultDtoTemp buildChainedRoute(Coordinate start, double totalTimeMinutes) {
+    public BestRouteResultDto buildChainedRoute(Coordinate start, double totalTimeMinutes) {
         List<GHPoint> chainedPoints = new ArrayList<>();
         List<ResponsePath> chainedPaths = new ArrayList<>();
         JSONArray geoJsonFeatures = new JSONArray();
@@ -40,7 +49,7 @@ public class RouteChainBuilder {
 
         System.out.printf("[START] 총 시간: %.2f분, 스텝당 시간 제한: %.2f분\n", totalTimeMinutes, stepTimeLimit);
 
-        for (int i = 0; i < 2; i++) {  // 최대 2개 경유지 생성
+        for (int i = 0; i < 2; i++) {
             System.out.printf("[STEP %d] 현재 좌표: %.6f, %.6f\n", i + 1, currentPoint.getLat(), currentPoint.getLon());
 
             List<CandidateRoute> candidates = routeService.findCandidateRoutes(currentPoint, (int) stepTimeLimit);
@@ -51,18 +60,42 @@ public class RouteChainBuilder {
             for (CandidateRoute candidate : candidates) {
                 GHPoint nextPoint = candidate.getPoint();
 
+                // 각도 조건 검사
                 if (chainedPoints.size() >= 2) {
                     GHPoint p1 = chainedPoints.get(chainedPoints.size() - 2);
                     GHPoint p2 = chainedPoints.get(chainedPoints.size() - 1);
                     double angle = computeAngle(p1, p2, nextPoint);
                     System.out.printf("[DEBUG] 세 점 각도: %.2f도\n", angle);
-
                     if (angle < 30 || angle > 150) {
                         System.out.printf("[SKIP] 각도 조건 불만족 (%.2f도)\n", angle);
                         continue;
                     }
                 }
 
+                // 경사도 검사
+                PointList pointList = candidate.getPoints();
+                if (pointList == null) {
+                    System.out.println("[SKIP] candidate.getPoints()가 null입니다. 후보 경로 무시.");
+                    continue;
+                }
+
+                List<GHPoint> ghPoints = new ArrayList<>();
+                for (int idx = 0; idx < pointList.size(); idx++) {
+                    ghPoints.add(pointList.get(idx));
+                }
+
+                RouteInfoDto routeInfo = graphhopperService.buildRouteGeoJsonWithInfo(ghPoints);
+                if (routeInfo == null) {
+                    System.out.println("[SKIP] routeInfo가 null입니다. 경로 생성 실패.");
+                    continue;
+                }
+
+                if (routeInfo.getMaxSlope() >= 0.08) {
+                    System.out.printf("[SKIP] 경사도 조건 불만족 (%.2f%%)\n", routeInfo.getMaxSlope() * 100);
+                    continue;
+                }
+
+                // ✅ 경로 채택
                 ResponsePath path = candidate.getPath();
                 double timeMin = path.getTime() / 60000.0;
 
@@ -82,31 +115,27 @@ public class RouteChainBuilder {
             }
         }
 
-        // 🔁 p0, p1, p2가 있다면 대칭 경유지 추가 및 복귀 루트 설정
         if (chainedPoints.size() >= 3) {
             GHPoint p1 = chainedPoints.get(1);
             GHPoint p2 = chainedPoints.get(2);
-            GHPoint p3 = reflectPoint(p0, p2, p1);  // 대칭 경유지
+            GHPoint p3 = reflectPoint(p0, p2, p1);
 
             if (!chainedPoints.contains(p3)) {
                 chainedPoints.add(p3);
             }
 
-            // p2 → p3
             RouteResultDtoTemp segment1 = routeService.findBestRouteBetween(p2, p3);
             if (segment1 != null && segment1.getResponsePath() != null) {
                 chainedPaths.add(segment1.getResponsePath());
                 geoJsonFeatures.add(parseGeoJsonFeature(segment1.getGeoJson()));
             }
 
-            // p3 → p0 (복귀)
             RouteResultDtoTemp segment2 = routeService.findBestRouteBetween(p3, p0);
             if (segment2 != null && segment2.getResponsePath() != null) {
                 chainedPaths.add(segment2.getResponsePath());
                 geoJsonFeatures.add(parseGeoJsonFeature(segment2.getGeoJson()));
             }
         } else {
-            // 최소 경유지가 부족해도 반드시 p0로 귀환
             GHPoint lastPoint = chainedPoints.get(chainedPoints.size() - 1);
             if (!lastPoint.equals(p0)) {
                 RouteResultDtoTemp returnSegment = routeService.findBestRouteBetween(lastPoint, p0);
@@ -117,31 +146,38 @@ public class RouteChainBuilder {
             }
         }
 
-        // GeoJSON 병합
         JSONObject fullGeoJson = new JSONObject();
         fullGeoJson.put("type", "FeatureCollection");
         fullGeoJson.put("features", geoJsonFeatures);
         String combinedGeoJson = fullGeoJson.toString();
-
         String mergedGeoJson = mergeGeoJsonCoordinates(combinedGeoJson);
-        ResponsePath last = chainedPaths.isEmpty() ? null : chainedPaths.get(chainedPaths.size() - 1);
-
-        System.out.println("[FINISH] 최종 GeoJSON 및 포인트 반환 완료");
 
         double totalDistance = 0.0;
         double totalDuration = 0.0;
+        double totalSlope = 0.0;
+        double maxSlope = 0.0;
+        int slopeCount = 0;
 
         for (ResponsePath path : chainedPaths) {
-            totalDistance += path.getDistance(); // m
-            totalDuration += path.getTime() / 1000.0; // ms → s
+            totalDistance += path.getDistance();
+            totalDuration += path.getTime() / 1000.0;
+
+            // 경사도 계산
+            PointList pointList = path.getPoints();
+            SlopeDto slope = CalculateAvrSlope.calculateAverageSlope(pointList);
+            totalSlope += slope.getAverageSlope();
+            if (slope.getMaxSlope() > maxSlope) {
+                maxSlope = slope.getMaxSlope();
+            }
+            slopeCount++;
         }
 
-        System.out.println("[Debug] distance: " + totalDistance + "m, duration: " + totalDuration + "s");
+        double averageSlope = slopeCount > 0 ? totalSlope / slopeCount : 0.0;
 
+        System.out.printf("[FINISH] 거리: %.2f m, 시간: %.2f s, 평균 경사: %.2f, 최대 경사: %.2f\n",
+                totalDistance, totalDuration, averageSlope, maxSlope);
 
-        // ✅ 중복 제거 후 반환
-        List<GHPoint> dedupedPoints = new ArrayList<>(new LinkedHashSet<>(chainedPoints));
-        return new RouteResultDtoTemp(mergedGeoJson, dedupedPoints, last);
+        return new BestRouteResultDto(mergedGeoJson, totalDistance, totalDuration, averageSlope, maxSlope);
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.ttaraga.ttaraga.controller;
 
+import com.example.ttaraga.ttaraga.dto.BestRouteResultDto;
 import com.example.ttaraga.ttaraga.dto.RouteRequestDto;
 import com.example.ttaraga.ttaraga.dto.RouteResultDtoTemp;
 import com.example.ttaraga.ttaraga.service.Alg2.WayPointSelectionService;
@@ -111,7 +112,7 @@ public class RouteController {
     }
 
     @PostMapping("/best")
-    public RouteResultDtoTemp bestRoute(@RequestBody RouteRequestDto request) {
+    public BestRouteResultDto bestRoute(@RequestBody RouteRequestDto request) {
         Coordinate start = new Coordinate(request.getLon(), request.getLat());
         double timeLimit = request.getTimeLimitMinutes();
 
