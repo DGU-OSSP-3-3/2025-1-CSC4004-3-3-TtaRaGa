@@ -7,8 +7,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "route-evaluation")
 public class RouteEvaluationConfig {
 
-    private double slopeWeight;
-    private double sceneryWeight;
+    private double slopeWeight = 0.3;
+    private double sceneryWeight = 0.3;
+    private double bikePathWeight = 0.4;
     private double congestionWeight;
     private double weatherWeight;
 
@@ -43,4 +44,14 @@ public class RouteEvaluationConfig {
     public void setWeatherWeight(double weatherWeight) {
         this.weatherWeight = weatherWeight;
     }
+
+    public double getBikePathWeight() {
+        return bikePathWeight;
+    }
+
+    public void setBikePathWeightWeight(double bikePathWeight) {
+        this.bikePathWeight = bikePathWeight;
+    }
+
+
 }
