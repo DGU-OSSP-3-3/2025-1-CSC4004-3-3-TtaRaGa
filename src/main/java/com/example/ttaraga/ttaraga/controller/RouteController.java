@@ -22,16 +22,16 @@ import java.util.*;
 @Validated
 public class RouteController {
 
-//    private final RouteService routeService;
-//    private final MidpointCalculatorService midpointService;
-//    private final GraphhopperService graphhopperService;
+    private final RouteService routeService;
+    private final MidpointCalculatorService midpointService;
+    private final GraphhopperService graphhopperService;
     private final WayPointSelectionService wayPointSelectionService;
 
     @Autowired
-    public RouteController( WayPointSelectionService wayPointSelectionService) {
-//        this.routeService = routeService;
-//        this.midpointService = midpointService;
-//        this.graphhopperService = graphhopperService;
+    public RouteController( WayPointSelectionService wayPointSelectionService, RouteService routeService, MidpointCalculatorService midpointService, GraphhopperService graphhopperService) {
+        this.routeService = routeService;
+        this.midpointService = midpointService;
+        this.graphhopperService = graphhopperService;
         this.wayPointSelectionService = wayPointSelectionService;
     }
 
@@ -197,94 +197,4 @@ public class RouteController {
 // 선택된 웨이포인트가 없으면 에러 반환
 
 
-// 경유지: 광화문광장 부근 (임의의 위치)
-//나중에 포인트고르는 알고리즘을 통해 waypoints 리턴 해주기
-// WaypointSelectionService를 통해 최적의 웨이포인트 두 개를 가져옵니다.
-//List<GHPoint> waypoints = new ArrayList<>();
-//        List<GHPoint> selectionWaypoints = wayPointSelectionService.selectOptimalWaypoints(
-//                startLat,startLon,minDistance,maxDistance,limit
-//        );
-    @GetMapping("/test-bike-route")
-    public ResponseEntity<String> getTestBikeRoute() {
-        // --- 임의의 출발점, 경유지, 도착점 설정 ---
-        // 출발: 서울시청 부근 임의로 지정한거임
-        //나중에 프론트에서 따릉이 이름 쏴주면 db에서 위도 가져오기
-        GHPoint startPoint = new GHPoint(37.5665, 126.9780);
-
-        // 경유지: 광화문광장 부근 (임의의 위치)
-        //나중에 포인트 고르는 알고리즘을 통해 waypoints 리턴 해주기
-        List<GHPoint> waypoints = new ArrayList<>();
-        waypoints.add(new GHPoint(37.5750, 126.9770)); // 광화문광장 대략적인 위도, 경도
-
-        // 도착: 남산타워 부근
-        GHPoint endPoint = new GHPoint(37.5512, 126.9882);
-
-        try {
-            String geoJsonRoute = graphhopperService.getRouteGeoJson(startPoint, endPoint, waypoints);
-            return ResponseEntity.ok(geoJsonRoute); // 200 OK와 함께 GeoJSON 반환
-        } catch (RuntimeException e) {
-            System.err.println("경로 계산 중 오류 발생: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("{\"error\": \"경로 계산 실패: " + e.getMessage() + "\"}");
-        }
-    }
-    /**
-     * 🧪 테스트용: 일정 시간 기준 도달 가능한 거리 내 중간 지점 계산 + 경로 정보 반환
-     * 🔗 GET /api/route/recommend?lat=...&lon=...&time=...
-     */
-    @GetMapping("/recommend")
-    public Map<String, Object> recommendPath(
-            @RequestParam double lat,
-            @RequestParam double lon,
-            @RequestParam double time // 단위: 분
-    ) {
-        GHPoint start = new GHPoint(lat, lon);
-        double timeInHours = time / 60.0;
-
-        GHPoint mid = midpointService.findMidpoint(start, timeInHours);
-        ResponsePath path = midpointService.getPath(start, mid);
-
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("start", start);
-        result.put("midpoint", mid);
-        result.put("distance_km", path.getDistance() / 1000.0);
-        result.put("time_minutes", path.getTime() / 60000.0);
-        result.put("points", path.getPoints().toLineString(false)); // 단순한 좌표 배열
-
-        return result;
-    }
-
-// 폐쇄 경로를 위한 전체 포인트 리스트 구성: 시작점 + 경유지1 + 경유지2 + 시작점
-//List<GHPoint> fullRoutePoints = new ArrayList<>();
-//fullRoutePoints.add(startPoint);
-//fullRoutePoints.addAll(selectionWaypoints); // 선택된 2개의 경유지 추가
-//fullRoutePoints.add(startPoint); // 폐쇄 경로를 위해 다시 시작점 추
-
-//waypoints.add(new GHPoint(37.5750, 126.9770)); // 광화문광장 대략적인 위도, 경도
-
-
-    //실제 사용할 코드
-    //프론트에서 시작점을 받으면 계산해서 GeoJson반환해줌
-    // HTTP POST 요청을 "/api/route/calculate"로 매핑
-    @PostMapping("/calculate")
-    public ResponseEntity<String> calculateRoute(@RequestBody RouteSearchRequestDto request) {
-        // 요청 DTO의 출발점이나 도착점이 null이면 400 Bad Request 반환
-        if (request.getStart() == null || request.getEnd() == null) {
-            return ResponseEntity.badRequest().body("{\"error\": \"출발점과 도착점은 필수입니다.\"}");
-        }
-        try {
-            // GraphhopperService를 호출하여 경로 계산
-            // 경유지가 없으면 null 또는 빈 리스트가 서비스로 전달됩니다.
-            String geoJsonRoute = graphhopperService.getRouteGeoJson(
-                    request.getStart(),
-                    request.getEnd(),
-                    request.getWaypoints() // 경유지가 없으면 null 또는 빈 리스트 전달
-            );
-            return ResponseEntity.ok(geoJsonRoute);
-        } catch (RuntimeException e) {
-            System.err.println("경로 계산 중 오류 발생: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("{\"error\": \"경로 계산 실패: " + e.getMessage() + "\"}");
-        }
-    }
-}
+      
