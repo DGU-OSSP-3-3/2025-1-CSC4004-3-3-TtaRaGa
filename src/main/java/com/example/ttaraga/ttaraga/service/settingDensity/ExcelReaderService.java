@@ -4,6 +4,7 @@ import com.example.ttaraga.ttaraga.entity.DensityAreaInfo;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import com.example.ttaraga.ttaraga.service.settingDensity.GeoJsonGernerator;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -22,6 +23,14 @@ DensityAreaInfo.xmlx 전용으로 작성했음
 
 @Service
 public class ExcelReaderService {
+
+
+    private final GeoJsonGernerator geoJsonGernerator;
+
+    public ExcelReaderService(GeoJsonGernerator geoJsonGenerator) {
+        this.geoJsonGernerator = geoJsonGenerator;
+    }
+
 
     public List<DensityAreaInfo> readAreaInfoFromExcel(InputStream inputStream) throws Exception{
 //        System.out.println("엑셀 읽는중 .,,,.");
@@ -58,6 +67,33 @@ public class ExcelReaderService {
             areaInfo.setLatitude(getCellNumericValue(row.getCell(5),"위도"));
             areaInfo.setLongitude(getCellNumericValue(row.getCell(6),"경도"));
 
+            Double latitude = getCellNumericValue(row.getCell(5), "위도");
+            Double longitude = getCellNumericValue(row.getCell(6), "경도");
+
+            if (latitude != null && longitude != null) { // areaNm.isEmpty() 체크는 GeoJSON 생성과 분리
+                areaInfo.setLatitude(latitude);
+                areaInfo.setLongitude(longitude);
+
+                // ⚡️ GeoJSON 생성: 위도와 경도만 전달
+                String geoJsonData = geoJsonGernerator.generateSquareGeoJson(latitude, longitude);
+
+                if (geoJsonData != null) {
+                    areaInfo.setGeoJson(geoJsonData);
+                } else {
+                    System.err.println("경고: 위도 " + latitude + ", 경도 " + longitude + "에 대한 GeoJSON 생성 실패.");
+                }
+
+                // ⚡️ 우선순위 설정 (초기값 또는 다른 로직으로)
+                // 이 시점에는 실제 밀집도 레벨을 모르므로, 초기값을 설정하거나 비워둡니다.
+                // 보통 GraphHopper에서 가중치는 밀집도 레벨에 따라 동적으로 부여되므로,
+                // 엑셀에서 로드하는 이 시점에는 우선순위를 0으로 설정하거나, 아예 설정하지 않고
+                // 나중에 밀집도 API 호출 시에 업데이트하는 것이 일반적입니다.
+                // 여기서는 "정보 없음" 레벨에 해당하는 우선순위를 기본으로 설정합니다.
+
+
+            } else {
+                System.err.println("경고: 행 " + (rowIndex + 1) + "의 위도/경도 데이터가 유효하지 않아 GeoJSON 생성을 건너뜁니다.");
+            }
             areaInfoList.add(areaInfo);
             rowIndex++;
         }

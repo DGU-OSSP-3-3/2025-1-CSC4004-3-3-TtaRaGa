@@ -32,4 +32,7 @@ public class DensityAreaInfo {
     private Double latitude ; //위도
 
     private Double longitude; //경도
+
+    @Column(columnDefinition = "TEXT")
+    private String GeoJson; //지역 범위 정의
 }
