@@ -1,5 +1,6 @@
 package com.example.ttaraga.ttaraga.service.evaluation;
 
+import com.example.ttaraga.ttaraga.dto.BestRouteResultDto;
 import com.example.ttaraga.ttaraga.dto.RouteResultDto;
 import com.example.ttaraga.ttaraga.service.Routing.RouteService;
 import com.graphhopper.ResponsePath;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service
@@ -30,15 +32,15 @@ public class RouteChainBuilder {
         List<ResponsePath> chainedPaths = new ArrayList<>();
         JSONArray geoJsonFeatures = new JSONArray();
 
-        GHPoint currentPoint = new GHPoint(start.y, start.x);
-        chainedPoints.add(currentPoint);
+        GHPoint p0 = new GHPoint(start.y, start.x);
+        chainedPoints.add(p0);
+        GHPoint currentPoint = p0;
 
         double stepTimeLimit = totalTimeMinutes * 0.25;
-        int maxSteps = 4;
 
         System.out.printf("[START] 총 시간: %.2f분, 스텝당 시간 제한: %.2f분\n", totalTimeMinutes, stepTimeLimit);
 
-        for (int i = 0; i < maxSteps; i++) {
+        for (int i = 0; i < 2; i++) {  // 최대 2개 경유지 생성
             System.out.printf("[STEP %d] 현재 좌표: %.6f, %.6f\n", i + 1, currentPoint.getLat(), currentPoint.getLon());
 
             List<CandidateRoute> candidates = routeService.findCandidateRoutes(currentPoint, (int) stepTimeLimit);
@@ -80,19 +82,68 @@ public class RouteChainBuilder {
             }
         }
 
-        // 기존 여러 feature의 GeoJSON을 문자열로 변환
+        // 🔁 p0, p1, p2가 있다면 대칭 경유지 추가 및 복귀 루트 설정
+        if (chainedPoints.size() >= 3) {
+            GHPoint p1 = chainedPoints.get(1);
+            GHPoint p2 = chainedPoints.get(2);
+            GHPoint p3 = reflectPoint(p0, p2, p1);  // 대칭 경유지
+
+            if (!chainedPoints.contains(p3)) {
+                chainedPoints.add(p3);
+            }
+
+            // p2 → p3
+            RouteResultDto segment1 = routeService.findBestRouteBetween(p2, p3);
+            if (segment1 != null && segment1.getResponsePath() != null) {
+                chainedPaths.add(segment1.getResponsePath());
+                geoJsonFeatures.add(parseGeoJsonFeature(segment1.getGeoJson()));
+            }
+
+            // p3 → p0 (복귀)
+            RouteResultDto segment2 = routeService.findBestRouteBetween(p3, p0);
+            if (segment2 != null && segment2.getResponsePath() != null) {
+                chainedPaths.add(segment2.getResponsePath());
+                geoJsonFeatures.add(parseGeoJsonFeature(segment2.getGeoJson()));
+            }
+        } else {
+            // 최소 경유지가 부족해도 반드시 p0로 귀환
+            GHPoint lastPoint = chainedPoints.get(chainedPoints.size() - 1);
+            if (!lastPoint.equals(p0)) {
+                RouteResultDto returnSegment = routeService.findBestRouteBetween(lastPoint, p0);
+                if (returnSegment != null && returnSegment.getResponsePath() != null) {
+                    chainedPaths.add(returnSegment.getResponsePath());
+                    geoJsonFeatures.add(parseGeoJsonFeature(returnSegment.getGeoJson()));
+                }
+            }
+        }
+
+        // GeoJSON 병합
         JSONObject fullGeoJson = new JSONObject();
         fullGeoJson.put("type", "FeatureCollection");
         fullGeoJson.put("features", geoJsonFeatures);
         String combinedGeoJson = fullGeoJson.toString();
 
-        // coordinates만 합친 GeoJSON으로 변환
         String mergedGeoJson = mergeGeoJsonCoordinates(combinedGeoJson);
-
         ResponsePath last = chainedPaths.isEmpty() ? null : chainedPaths.get(chainedPaths.size() - 1);
+
         System.out.println("[FINISH] 최종 GeoJSON 및 포인트 반환 완료");
-        return new RouteResultDto(mergedGeoJson, chainedPoints, last);
+
+        double totalDistance = 0.0;
+        double totalDuration = 0.0;
+
+        for (ResponsePath path : chainedPaths) {
+            totalDistance += path.getDistance(); // m
+            totalDuration += path.getTime() / 1000.0; // ms → s
+        }
+
+        System.out.println("[Debug] distance: " + totalDistance + "m, duration: " + totalDuration + "s");
+
+
+        // ✅ 중복 제거 후 반환
+        List<GHPoint> dedupedPoints = new ArrayList<>(new LinkedHashSet<>(chainedPoints));
+        return new RouteResultDto(mergedGeoJson, dedupedPoints, last);
     }
+
 
     @SuppressWarnings("unchecked")
     public String mergeGeoJsonCoordinates(String geoJsonString) {
@@ -164,6 +215,30 @@ public class RouteChainBuilder {
         double cosTheta = dot / (mag1 * mag2);
         double angleRad = Math.acos(Math.max(-1, Math.min(1, cosTheta)));
         return Math.toDegrees(angleRad);
+    }
+
+    private GHPoint reflectPoint(GHPoint base1, GHPoint base2, GHPoint toReflect) {
+        // base1과 base2를 잇는 선분을 기준으로 toReflect를 대칭
+        double dx = base2.lon - base1.lon;
+        double dy = base2.lat - base1.lat;
+
+        double a = dy;
+        double b = -dx;
+        double c = dx * base1.lat - dy * base1.lon;
+
+        double d = (a * toReflect.lon + b * toReflect.lat + c) / (a * a + b * b);
+
+        double xPrime = toReflect.lon - 2 * a * d;
+        double yPrime = toReflect.lat - 2 * b * d;
+
+        return new GHPoint(yPrime, xPrime);
+    }
+
+    private GHPoint symmetricPoint(GHPoint center, GHPoint original) {
+        // center를 기준으로 original의 대칭점
+        double lat = 2 * center.lat - original.lat;
+        double lon = 2 * center.lon - original.lon;
+        return new GHPoint(lat, lon);
     }
 }
 

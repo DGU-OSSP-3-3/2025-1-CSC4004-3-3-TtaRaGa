@@ -112,6 +112,25 @@ public class RouteService {
                 .orElseThrow(() -> new NoValidRouteFoundException("유효한 루트를 찾을 수 없습니다."));
     }
 
+    public RouteResultDto findBestRouteBetween(GHPoint start, GHPoint end) {
+        System.out.printf("[DEBUG] findBestRoute(start, end) 호출: 시작점 = [%s], 도착점 = [%s]\n", start, end);
+
+        Optional<ResponsePath> pathOpt = graphhopperService.getPath(start, end);
+        if (pathOpt.isEmpty()) {
+            System.out.println("[ERROR] 두 지점 간 경로 생성 실패");
+            return null;
+        }
+
+        ResponsePath path = pathOpt.get();
+        double score = routeEvaluationService.evaluateRoute(path);
+        String geoJson = graphhopperService.convertToGeoJson(path);
+
+        System.out.printf("[DEBUG] ✅ 두 지점 경로 생성 완료 | 거리: %.2fm | 시간: %.2f분 | 점수: %.4f\n",
+                path.getDistance(), path.getTime() / 60000.0, score);
+
+        return new RouteResultDto(geoJson, List.of(start, end), path);
+    }
+
     public List<CandidateRoute> findCandidateRoutes(GHPoint start, int timeLimitMinutes) {
         double speedMetersPerMinute = 250.0; // 시속 15km 기준
         double bufferRatio = 0.9;

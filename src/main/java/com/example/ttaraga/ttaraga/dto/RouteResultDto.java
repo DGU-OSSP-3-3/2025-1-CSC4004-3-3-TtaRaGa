@@ -16,13 +16,16 @@ public class RouteResultDto {
     @Getter
     private ResponsePath responsePath;      // 실제 경로 객체 (점수 계산용)
 
+    // 기존 생성자
     public RouteResultDto(String geoJson, List<GHPoint> pathPoints) {
         this.geoJson = geoJson;
         this.pathPoints = pathPoints;
-        this.responsePath = null; // 초기화 시점에는 ResponsePath가 없으므로 null로 설정
+        this.responsePath = null;
+
     }
 
     public ResponsePath getResponsePath() {
         return responsePath;
     }
 }
+
