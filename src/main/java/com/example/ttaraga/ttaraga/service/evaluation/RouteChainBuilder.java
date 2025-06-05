@@ -45,7 +45,7 @@ public class RouteChainBuilder {
         chainedPoints.add(p0);
         GHPoint currentPoint = p0;
 
-        double stepTimeLimit = totalTimeMinutes * 0.25;
+        double stepTimeLimit = totalTimeMinutes * 0.3;
 
         System.out.printf("[START] 총 시간: %.2f분, 스텝당 시간 제한: %.2f분\n", totalTimeMinutes, stepTimeLimit);
 
@@ -118,22 +118,71 @@ public class RouteChainBuilder {
         if (chainedPoints.size() >= 3) {
             GHPoint p1 = chainedPoints.get(1);
             GHPoint p2 = chainedPoints.get(2);
-            GHPoint p3 = reflectPoint(p0, p2, p1);
 
-            if (!chainedPoints.contains(p3)) {
+            List<CandidateRoute> p3Candidates = routeService.findCandidateRoutes(p2, (int) stepTimeLimit);
+            p3Candidates.sort(Comparator.comparingDouble(CandidateRoute::getScore).reversed());
+
+            GHPoint p3 = null;
+
+            for (CandidateRoute candidate : p3Candidates) {
+                GHPoint p3Candidate = candidate.getPoint();
+
+                // 조건 A: p0-p2-p3 각도 (30° 이상 90° 이하)
+                double angleA = computeAngle(p0, p2, p3Candidate);
+                if (angleA < 30 || angleA > 90) {
+                    System.out.printf("[SKIP] 조건A 실패 - p0-p2-p3 각도 %.2f도\n", angleA);
+                    continue;
+                }
+
+                // 조건 B: p1-p2-p3 각도 (60° 초과)
+                double angleB = computeAngle(p1, p2, p3Candidate);
+                if (angleB <= 60) {
+                    System.out.printf("[SKIP] 조건B 실패 - p1-p2-p3 각도 %.2f도\n", angleB);
+                    continue;
+                }
+
+                // 경사도 조건
+                PointList ptList = candidate.getPoints();
+                if (ptList == null) continue;
+
+                List<GHPoint> ghPoints = new ArrayList<>();
+                for (int i = 0; i < ptList.size(); i++) {
+                    ghPoints.add(ptList.get(i));
+                }
+
+                RouteInfoDto routeInfo = graphhopperService.buildRouteGeoJsonWithInfo(ghPoints);
+                if (routeInfo == null || routeInfo.getMaxSlope() >= 0.08) {
+                    System.out.printf("[SKIP] 경사도 %.2f%% 초과\n", routeInfo != null ? routeInfo.getMaxSlope() * 100 : -1);
+                    continue;
+                }
+
+                // ✅ 조건 통과한 경우
+                p3 = p3Candidate;
                 chainedPoints.add(p3);
+                chainedPaths.add(candidate.getPath());
+                geoJsonFeatures.add(parseGeoJsonFeature(candidate.getGeoJson()));
+                System.out.printf("[SELECTED] p3 좌표: %.6f, %.6f (각도A: %.2f, 각도B: %.2f)\n",
+                        p3.getLat(), p3.getLon(), angleA, angleB);
+                break;
             }
 
-            RouteResultDtoTemp segment1 = routeService.findBestRouteBetween(p2, p3);
-            if (segment1 != null && segment1.getResponsePath() != null) {
-                chainedPaths.add(segment1.getResponsePath());
-                geoJsonFeatures.add(parseGeoJsonFeature(segment1.getGeoJson()));
-            }
-
-            RouteResultDtoTemp segment2 = routeService.findBestRouteBetween(p3, p0);
-            if (segment2 != null && segment2.getResponsePath() != null) {
-                chainedPaths.add(segment2.getResponsePath());
-                geoJsonFeatures.add(parseGeoJsonFeature(segment2.getGeoJson()));
+            if (p3 != null && !chainedPoints.contains(p3)) {
+                chainedPoints.add(p3);
+                RouteResultDtoTemp returnSegment = routeService.findBestRouteBetween(p3, p0);
+                if (returnSegment != null && returnSegment.getResponsePath() != null) {
+                    chainedPaths.add(returnSegment.getResponsePath());
+                    geoJsonFeatures.add(parseGeoJsonFeature(returnSegment.getGeoJson()));
+                }
+            } else {
+                // 🔁 fallback: p3 없으면 마지막 지점에서 복귀
+                GHPoint last = chainedPoints.get(chainedPoints.size() - 1);
+                if (!last.equals(p0)) {
+                    RouteResultDtoTemp fallbackReturn = routeService.findBestRouteBetween(last, p0);
+                    if (fallbackReturn != null && fallbackReturn.getResponsePath() != null) {
+                        chainedPaths.add(fallbackReturn.getResponsePath());
+                        geoJsonFeatures.add(parseGeoJsonFeature(fallbackReturn.getGeoJson()));
+                    }
+                }
             }
         } else {
             GHPoint lastPoint = chainedPoints.get(chainedPoints.size() - 1);
@@ -158,9 +207,24 @@ public class RouteChainBuilder {
         double maxSlope = 0.0;
         int slopeCount = 0;
 
-        for (ResponsePath path : chainedPaths) {
+//        for (ResponsePath path : chainedPaths) {
+//            totalDistance += path.getDistance();
+//            totalDuration += path.getTime() / 60000.0 * 1.5;
+//
+//            // 경사도 계산
+//            PointList pointList = path.getPoints();
+//            SlopeDto slope = CalculateAvrSlope.calculateAverageSlope(pointList);
+//            totalSlope += slope.getAverageSlope();
+//            if (slope.getMaxSlope() > maxSlope) {
+//                maxSlope = slope.getMaxSlope();
+//            }
+//            slopeCount++;
+//        }
+        for (int i = 0; i < chainedPaths.size(); i++) {
+            ResponsePath path = chainedPaths.get(i);
             totalDistance += path.getDistance();
-            totalDuration += path.getTime() / 1000.0;
+            double segmentDuration = path.getTime() / 60000.0;
+            totalDuration += segmentDuration;
 
             // 경사도 계산
             PointList pointList = path.getPoints();
@@ -170,11 +234,21 @@ public class RouteChainBuilder {
                 maxSlope = slope.getMaxSlope();
             }
             slopeCount++;
+
+            // 🪵 디버깅 로그: 경로 구간별 시간 및 좌표 출력
+            System.out.printf("🔹 [Segment %d] 거리: %.2fm | 시간: %.2f분 | 경사(평균/최대): %.3f / %.3f\n",
+                    i + 1, path.getDistance(), segmentDuration,
+                    slope.getAverageSlope(), slope.getMaxSlope());
+
+            for (int j = 0; j < pointList.size(); j++) {
+                GHPoint pt = pointList.get(j);
+                System.out.printf("    → %.6f, %.6f\n", pt.getLat(), pt.getLon());
+            }
         }
 
         double averageSlope = slopeCount > 0 ? totalSlope / slopeCount : 0.0;
 
-        System.out.printf("[FINISH] 거리: %.2f m, 시간: %.2f s, 평균 경사: %.2f, 최대 경사: %.2f\n",
+        System.out.printf("[FINISH] 거리: %.2f m, 시간: %.2f 분, 평균 경사: %.2f, 최대 경사: %.2f\n",
                 totalDistance, totalDuration, averageSlope, maxSlope);
 
         return new BestRouteResultDto(mergedGeoJson, totalDistance, totalDuration, averageSlope, maxSlope);
