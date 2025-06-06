@@ -193,19 +193,6 @@
             <artifactId>gt-referencing</artifactId>
             <version>${geotools.version}</version>
         </dependency>
-
-        <!-- ✅ GraphHopper core -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
-
     </dependencies>
 
     <build>
