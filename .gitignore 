@@ -1,0 +1,44 @@
+# Java
+*.class
+
+# Maven
+target/
+log/
+*.properties
+# Gradle (혹시나 해서)
+build/
+
+# Spring Tool Suite
+.apt_generated
+.factorypath
+.springBeans
+.sts4-cache
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# 기타
+HELP.md
+
+# 그래프 캐시.geojson 파일
+graph-cache/
+
+# 그래프호퍼 클론 받은 것
+
+
+# geojson 파일 전체 업로드 x
+*.geojson
